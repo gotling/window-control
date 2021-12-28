@@ -13,21 +13,33 @@
 #define TX_PIN 17                                          // Tx pin which the MHZ19 Rx pin is attached to
 #define BAUDRATE 9600                                      // Device to MH-Z19 Serial baudrate (should not be changed)
 
-
+// CO2 sensor
 MHZ19 myMHZ19;                                             // Constructor for library
 SoftwareSerial mySerial(RX_PIN, TX_PIN);                   // (Uno example) create device to MH-Z19 serial
 
-/* More data bus class: https://github.com/moononournation/Arduino_GFX/wiki/Data-Bus-Class */
+// Display
 Arduino_DataBus *bus = new Arduino_ESP32SPI(27 /* DC */, -1 /* CS */, 18 /* SCK */, 23 /* MOSI */, -1 /* MISO */, VSPI /* spi_num */);
 Arduino_GFX *gfx = new Arduino_ST7789(bus, 33 /* RST */, 2 /* rotation */, true /* IPS */,
                                       240 /* width */, 240 /* height */, 0 /* col offset 1 */, 80 /* row offset 1 */);
 #define TFT_BL 22
+//#include "FreeMono24pt7b.h"
 
+// LED
 #define LED 19
 unsigned int co2Threshold = 1000;
 
+// Input buttons
+#define BTN_OPEN 15
+#define BTN_CLOSE 4
+bool btnOpen = false;
+bool btnClose = false;
+unsigned long openTime = millis();
+unsigned long closeTime = millis();
+
+// Stats
 unsigned long getDataTimer = 0;
 unsigned long statsTimer = 0;
+unsigned long inputTimer = 0;
 unsigned long counter = 0;
 
 unsigned int minCO = 5000;
@@ -37,6 +49,8 @@ unsigned int avg1[30];
 unsigned int avg5[30 * 5];
 unsigned int avg15[30 * 15];
 
+
+// Helper functions
 unsigned int getAvg(unsigned int values[], int sizeOfArray) {
   unsigned int sum = 0;
   int iMax = sizeOfArray;
@@ -49,18 +63,14 @@ unsigned int getAvg(unsigned int values[], int sizeOfArray) {
   return sum / iMax;
 }
 
+// Setup
 void setup()
 {
   Serial.begin(115200);                                     // Device to serial monitor feedback
 
+  // CO2 sensor
   mySerial.begin(BAUDRATE);                               // (Uno example) device to MH-Z19 serial start
   myMHZ19.begin(mySerial);                                // *Serial(Stream) refence must be passed to library begin().
-
-
-  /*
-      getVersion(char array[]) returns version number to the argument. The first 2 char are the major
-      version, and second 2 bytes the minor version. e.g 02.11
-  */
 
   char myVersion[4];
   myMHZ19.getVersion(myVersion);
@@ -89,21 +99,46 @@ void setup()
   digitalWrite(LED, LOW);
 
   // Display
-
   gfx->begin();
   gfx->fillScreen(BLACK);
+  //gfx->setFont(&FreeMono24pt7b);
 
   pinMode(TFT_BL, OUTPUT);
   digitalWrite(TFT_BL, HIGH);
 
-  gfx->setCursor(100, 100);
+  gfx->setCursor(20, 60);
   gfx->setTextColor(WHITE);
-  gfx->setTextSize(8, 8, 2);
+  gfx->setTextSize(16, 16, 2);
   gfx->println(":)");
+
+  // Input buttons
+  pinMode(BTN_OPEN, INPUT_PULLUP);
+  pinMode(BTN_CLOSE, INPUT_PULLUP);
 }
 
+void refreshDisplay() {
+  
+}
+
+void displayInput(unsigned int x, unsigned int y) {
+  gfx->fillRect(x-16, y-16, 80+16, 30+16, BLACK);
+
+  if (!btnOpen) {
+    gfx->drawCircle(x, y, 16, GREEN);
+  } else {
+    gfx->fillCircle(x, y, 16, GREEN);
+  }
+
+  if (!btnClose) {
+    gfx->drawCircle(x + 40, y, 16, RED);
+  } else {
+    gfx->fillCircle(x + 40, y, 16, RED);
+  }
+}
+
+// Main loop
 void loop()
-{
+{ 
   if (millis() - getDataTimer >= 2000)
   {
     unsigned int CO2;
@@ -125,6 +160,8 @@ void loop()
 
     getDataTimer = millis();
     counter++;
+
+    displayInput(160, 180);
   }
 
   // Print stats every 10 seconds
@@ -165,12 +202,12 @@ void loop()
     int y = 0;
 
     gfx->fillScreen(BLACK);
-    gfx->setCursor(x, y);
-    gfx->setTextColor(NAVY);
-    gfx->setTextSize(2, 3, 0);
-    gfx->println("CO2 (ppm)");
-
-    y += 30;
+//    gfx->setCursor(x, y);
+//    gfx->setTextColor(NAVY);
+//    gfx->setTextSize(2, 3, 0);
+//    gfx->println("CO2 (ppm)");
+//
+//    y += 30;
 
     gfx->setTextColor(PURPLE);
     gfx->setTextSize(2, 2, 0);
@@ -228,6 +265,9 @@ void loop()
 
     gfx->println("Temperature");
 
+    gfx->setCursor(x + 160, y);
+    gfx->println("Input");
+
     y += 20;
 
     gfx->setTextColor(LIGHTGREY);
@@ -238,6 +278,34 @@ void loop()
     gfx->print((char)247);
     gfx->println("C");
 
+    displayInput(160, y+20);
+
+    long diff = (millis() - openTime) / 1000;
+
+    y += 40;
+    gfx->setTextSize(1, 1, 0);
+    gfx->setTextColor(CYAN);
+    gfx->setCursor(x, y);
+    gfx->print(diff);
+    gfx->print(" ");
+
+    diff = (millis() - closeTime) / 1000;
+    gfx->print(diff);
+    
     statsTimer = millis();
+  }
+
+  if (millis() - inputTimer >= 100) {
+    btnOpen = digitalRead(BTN_OPEN);
+    btnClose = digitalRead(BTN_CLOSE);
+
+    if (btnOpen) {
+      openTime = millis();
+    }
+    if (btnClose) {
+      closeTime = millis();
+    }
+    
+    inputTimer = millis();
   }
 }
