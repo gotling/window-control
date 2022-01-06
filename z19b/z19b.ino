@@ -1,7 +1,10 @@
 /*
- * 
+ * # Libraries
+ * https://github.com/plerup/espsoftwareserial/
  * https://github.com/WifWaf/MH-Z19/blob/master/examples/RetrieveDeviceInfo/RetrieveDeviceInfo.ino
  * https://github.com/moononournation/Arduino_GFX/blob/master/examples/HelloWorld/HelloWorld.ino
+ * https://github.com/ubidefeo/FTDebouncer
+ * https://github.com/adafruit/DHT-sensor-library
  */
 
 #include <Arduino.h>
@@ -14,6 +17,10 @@
 #define RX_PIN 16                                          // Rx pin which the MHZ19 Tx pin is attached to
 #define TX_PIN 17                                          // Tx pin which the MHZ19 Rx pin is attached to
 #define BAUDRATE 9600                                      // Device to MH-Z19 Serial baudrate (should not be changed)
+
+// Serial log
+#define RX0_PIN 3
+#define TX0_PIN 1
 
 // CO2 sensor
 MHZ19 myMHZ19;                                             // Constructor for library
@@ -28,9 +35,9 @@ int humidityOffset = 0;
 
 // Display
 Arduino_DataBus *bus = new Arduino_ESP32SPI(27 /* DC */, -1 /* CS */, 14 /* SCK */, 13 /* MOSI */, -1 /* MISO */, VSPI /* spi_num */);
-Arduino_GFX *gfx = new Arduino_ST7789(bus, 26 /* RST */, 2 /* rotation */, true /* IPS */,
+Arduino_GFX *gfx = new Arduino_ST7789(bus, 12 /* RST */, 2 /* rotation */, true /* IPS */,
                                       240 /* width */, 240 /* height */, 0 /* col offset 1 */, 80 /* row offset 1 */);
-#define TFT_BL 12
+#define TFT_BL 26
 bool backlightState = true;
 //#include "FreeMono24pt7b.h"
 
@@ -41,6 +48,10 @@ unsigned int co2Threshold = 1000;
 // Input buttons
 #define BTN_OPEN 35
 #define BTN_CLOSE 34
+#define BTN_DOWN 18
+#define BTN_MIDDLE 5
+#define BTN_UP 19
+
 //bool btnOpenState = false;
 bool btnClose = false;
 unsigned long openTime = millis();
@@ -48,6 +59,10 @@ unsigned long closeTime = millis();
 char timeDisplay[8];
 
 FTDebouncer pinDebouncer;
+
+// Output MOSFET
+#define OPEN_OUT 33
+#define CLOSE_OUT 32
 
 // Stats
 unsigned long getDataTimer = 0;
@@ -88,28 +103,51 @@ unsigned int getAvg(unsigned int values[], int sizeOfArray) {
 
 // Input
 void onPinActivated(int pinNumber){
-  unsigned int x = 180;
+  unsigned int x = 200;
   unsigned int y = 220;
+
+  Serial.print("buttonPress: ");
+  Serial.println(pinNumber);
 
   switch (pinNumber) {
     case BTN_OPEN:
-      Serial.println("press");
       openTime = millis();
       windowOpen = true;
       gfx->fillCircle(x, y, 16, GREEN);
+      break;
+    case BTN_CLOSE:
+      closeTime = millis();
+      windowOpen = false;
+      gfx->fillCircle(x + 20, y, 16, RED);
+      break;
+    case BTN_DOWN:
+      digitalWrite(OPEN_OUT, HIGH);
+      break;
+    case BTN_UP:
+      digitalWrite(CLOSE_OUT, HIGH);
+      break;
+    case BTN_MIDDLE:
+      digitalWrite(OPEN_OUT, LOW);
+      digitalWrite(CLOSE_OUT, LOW);
       break;
   }
 }
 
 void onPinDeactivated(int pinNumber){
-  unsigned int x = 180;
+  unsigned int x = 200;
   unsigned int y = 220;
+
+  Serial.print("buttonRelease: ");
+  Serial.println(pinNumber);
 
   switch (pinNumber) {
     case BTN_OPEN:
-      Serial.println("release");
       gfx->fillCircle(x, y, 16, BLACK);
       gfx->drawCircle(x, y, 16, GREEN);
+      break;
+    case BTN_CLOSE:
+      gfx->fillCircle(x + 20, y, 16, BLACK);
+      gfx->drawCircle(x + 20, y, 16, RED);
       break;
   }
 }
@@ -117,8 +155,9 @@ void onPinDeactivated(int pinNumber){
 // Setup
 void setup()
 {
-  Serial.begin(115200);                                     // Device to serial monitor feedback
-
+  //Serial.begin(115200);                                     // Device to serial monitor feedback
+  Serial.begin(115200, SERIAL_8N1, RX0_PIN, TX0_PIN);
+  
   // CO2 sensor
   mySerial.begin(BAUDRATE);                               // (Uno example) device to MH-Z19 serial start
   myMHZ19.begin(mySerial);                                // *Serial(Stream) refence must be passed to library begin().
@@ -157,7 +196,6 @@ void setup()
   gfx->fillScreen(BLACK);
   //gfx->setFont(&FreeMono24pt7b);
 
-  
   pinMode(TFT_BL, OUTPUT);
   digitalWrite(TFT_BL, backlightState);
 
@@ -167,11 +205,19 @@ void setup()
   gfx->println(":)");
 
   // Input buttons
-  //pinMode(BTN_OPEN, INPUT_PULLUP);
-  //btnOpen.set(BTN_OPEN, btnOpenCallback, EXT_PULL_DOWN);
   pinDebouncer.addPin(BTN_OPEN, LOW);
+  pinDebouncer.addPin(BTN_CLOSE, LOW);
+  
+  pinDebouncer.addPin(BTN_DOWN, HIGH, INPUT_PULLUP);
+  pinDebouncer.addPin(BTN_MIDDLE, HIGH, INPUT_PULLUP);
+  pinDebouncer.addPin(BTN_UP, HIGH, INPUT_PULLUP);
   pinDebouncer.begin();
-  pinMode(BTN_CLOSE, INPUT_PULLUP);
+
+  // Output MOSFET
+  pinMode(OPEN_OUT, OUTPUT);
+  pinMode(CLOSE_OUT, OUTPUT);
+  digitalWrite(OPEN_OUT, LOW);
+  digitalWrite(CLOSE_OUT, LOW);
 }
 
 void refreshDisplay() {
@@ -252,8 +298,6 @@ void refreshDisplay() {
   gfx->setCursor(x + 120, y);
   gfx->print(humidity);
   gfx->print(" %");
-  
-  displayInput(180, 220);
 
   refreshTime();
 }
@@ -264,33 +308,17 @@ void refreshTime() {
   unsigned int y = 200;
 
   gfx->setCursor(x, y);
-  gfx->setTextColor(PURPLE);
+  gfx->setTextColor(PURPLE, BLACK);
   gfx->setTextSize(2, 2, 0);
   
   if (windowOpen) {
-    gfx->print("Windows open");
+    gfx->print("Windows open  ");
     diff = (millis() - openTime) / 1000;
     displayTime(diff, x, y + 20);
   } else {
     gfx->print("Windows closed");
     diff = (millis() - closeTime) / 1000;
     displayTime(diff, x, y + 20);
-  }
-}
-
-void displayInput(unsigned int x, unsigned int y) {
-  //gfx->fillRect(x-16, y-16, 80+16, 30+10, BLACK);
-
-//  if (!windowOpen) {
-//    gfx->drawCircle(x, y, 16, GREEN);
-//  } else {
-//    gfx->fillCircle(x, y, 16, GREEN);
-//  }
-
-  if (!btnClose) {
-    gfx->drawCircle(x + 40, y, 16, RED);
-  } else {
-    gfx->fillCircle(x + 40, y, 16, RED);
   }
 }
 
@@ -350,8 +378,6 @@ void loop()
 
     getDataTimer = millis();
     counter++;
-
-    displayInput(180, 220);
   }
 
   // Print stats every 10 seconds
@@ -394,24 +420,5 @@ void loop()
     statsTimer = millis();
   }
 
-  //btnOpen.poll();
   pinDebouncer.update();
-
-  if (millis() - inputTimer >= 100) {
-    //btnOpen = digitalRead(BTN_OPEN);
-    btnClose = digitalRead(BTN_CLOSE);
-
-//    if (btnOpen) {
-//      openTime = millis();
-//      windowOpen = true;
-//      refreshDisplay();
-//    }
-    if (btnClose) {
-      closeTime = millis();
-      windowOpen = false;
-      refreshDisplay();
-    }
-    
-    inputTimer = millis();
-  }
 }
