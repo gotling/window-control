@@ -40,6 +40,7 @@ Arduino_GFX *gfx = new Arduino_ST7789(bus, 12 /* RST */, 3 /* rotation */, true 
                                       240 /* width */, 240 /* height */, 0 /* col offset 1 */, 80 /* row offset 1 */);
 #define TFT_BL 26
 bool backlightState = true;
+unsigned int toastTime = 2000;
 
 // LED
 #define LED 2
@@ -57,6 +58,12 @@ unsigned int co2LowerThreshold = 900;
 unsigned long openTimeThreshold = 60000;
 
 // Stats
+enum {
+  displayStats,
+  displayWindowOpen,
+  displayWindowClosing
+} displayState = displayStats;
+
 unsigned long statsTimer = 0;
 unsigned long secondTimer = 0;
 unsigned long counter = 0;
@@ -89,6 +96,9 @@ void refreshLED() {
 }
 
 void closeWindows() {
+  displayState = displayWindowClosing;
+  windowClosingDisplay();
+
   digitalWrite(CLOSE_OUT, HIGH);
   delay(100);
   digitalWrite(CLOSE_OUT, LOW);
@@ -111,7 +121,20 @@ void readAndRefresh() {
 
   serialLog();
 
-  refreshDisplay();
+  switch(displayState) {
+    case displayStats:
+      refreshDisplay();
+      break;
+    case displayWindowOpen:
+      windowOpenDisplay();
+      break;
+    case displayWindowClosing:
+      windowClosingDisplay();
+      break;
+    default:
+      refreshDisplay();
+      break;
+  }
 
   refreshLED();
 }
@@ -168,5 +191,11 @@ void loop()
     actionOnCO2();
     
     statsTimer = millis();
+  }
+
+  // Reset display to default
+  if (displayState == displayWindowClosing && (millis() - closeTime) > toastTime) {
+    displayState = displayStats;
+    refreshDisplay();
   }
 }

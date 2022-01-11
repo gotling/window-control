@@ -35,6 +35,8 @@ void onPinActivated(int pinNumber){
       break;
     case BTN_UP:
       Serial.println("OPEN OUT HIGH");
+      displayState = displayWindowOpen;
+      windowOpenDisplay();
       digitalWrite(OPEN_OUT, HIGH);
       delay(100);
       digitalWrite(OPEN_OUT, LOW);
@@ -43,6 +45,7 @@ void onPinActivated(int pinNumber){
       break;
     case BTN_DOWN:
       Serial.println("CLOSE OUT HIGH");
+      displayState = displayWindowClosing;
       digitalWrite(CLOSE_OUT, HIGH);
       delay(100);
       digitalWrite(CLOSE_OUT, LOW);
