@@ -1,3 +1,9 @@
+#define BTN_OPEN 35
+#define BTN_CLOSE 34
+#define BTN_DOWN 18
+#define BTN_MIDDLE 5
+#define BTN_UP 19
+
 void setupButtons() {
   pinDebouncer.addPin(BTN_OPEN, LOW);
   pinDebouncer.addPin(BTN_CLOSE, LOW);

@@ -1,3 +1,11 @@
+char timeDisplay[8];
+
+void setupDisplay() {
+  gfx->begin();
+  pinMode(TFT_BL, OUTPUT);
+  digitalWrite(TFT_BL, backlightState);
+}
+
 void displayStartupScreen() {
   gfx->fillScreen(BLACK);
   gfx->setCursor(20, 60);
