@@ -33,15 +33,19 @@ void onPinActivated(int pinNumber){
       windowOpen = false;
       gfx->fillCircle(x + 20, y, 16, RED);
       break;
-    case BTN_DOWN:
+    case BTN_UP:
       Serial.println("OPEN OUT HIGH");
       digitalWrite(OPEN_OUT, HIGH);
+      delay(100);
+      digitalWrite(OPEN_OUT, LOW);
       windowOpen = true;
       openTime = millis();
       break;
-    case BTN_UP:
+    case BTN_DOWN:
       Serial.println("CLOSE OUT HIGH");
       digitalWrite(CLOSE_OUT, HIGH);
+      delay(100);
+      digitalWrite(CLOSE_OUT, LOW);
       windowOpen = false;
       closeTime = millis();
       break;

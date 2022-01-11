@@ -88,16 +88,20 @@ void refreshLED() {
   }
 }
 
+void closeWindows() {
+  digitalWrite(CLOSE_OUT, HIGH);
+  delay(100);
+  digitalWrite(CLOSE_OUT, LOW);
+  Serial.println("Sent windows close trigger");
+  windowOpen = false; // TODO: Remove this when read signal from button press which should trigger when we send close signal
+  closeTime = millis();  
+}
+
 void actionOnCO2() {
-  if (windowOpen && openTime > openTimeThreshold) {
+  if (windowOpen && (millis() - openTime) > openTimeThreshold) {
     if (a1 <= co2LowerThreshold) {
       // Good CO2 level reached, close windows by sending button press
-      digitalWrite(CLOSE_OUT, HIGH);
-      delay(100);
-      digitalWrite(CLOSE_OUT, LOW);
-      Serial.println("Sent windows close trigger");
-      windowOpen = false; // TODO: Remove this when read signal from button press which should trigger when we send close signal
-      closeTime = millis();
+      closeWindows();
     }
   }
 }
