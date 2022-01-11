@@ -36,10 +36,14 @@ void onPinActivated(int pinNumber){
     case BTN_DOWN:
       Serial.println("OPEN OUT HIGH");
       digitalWrite(OPEN_OUT, HIGH);
+      windowOpen = true;
+      openTime = millis();
       break;
     case BTN_UP:
       Serial.println("CLOSE OUT HIGH");
       digitalWrite(CLOSE_OUT, HIGH);
+      windowOpen = false;
+      closeTime = millis();
       break;
     case BTN_MIDDLE:
       Serial.println("CLOSE AND OPEN LOW");

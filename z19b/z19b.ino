@@ -43,7 +43,6 @@ bool backlightState = true;
 
 // LED
 #define LED 2
-unsigned int co2Threshold = 1000;
 
 // Buttons
 FTDebouncer pinDebouncer;
@@ -51,6 +50,11 @@ FTDebouncer pinDebouncer;
 // Output MOSFET
 #define OPEN_OUT 33
 #define CLOSE_OUT 32
+
+// Configuration
+unsigned int co2UpperThreshold = 1000;
+unsigned int co2LowerThreshold = 900;
+unsigned long openTimeThreshold = 60000;
 
 // Stats
 unsigned long statsTimer = 0;
@@ -77,10 +81,24 @@ int temperature;
 unsigned int humidity;
 
 void refreshLED() {
-  if (a1 > co2Threshold) {
+  if (a1 >= co2UpperThreshold) {
     digitalWrite(LED, HIGH);
-  } else {
+  } else if (a1 <= co2LowerThreshold) {
     digitalWrite(LED, LOW);
+  }
+}
+
+void actionOnCO2() {
+  if (windowOpen && openTime > openTimeThreshold) {
+    if (a1 <= co2LowerThreshold) {
+      // Good CO2 level reached, close windows by sending button press
+      digitalWrite(CLOSE_OUT, HIGH);
+      delay(100);
+      digitalWrite(CLOSE_OUT, LOW);
+      Serial.println("Sent windows close trigger");
+      windowOpen = false; // TODO: Remove this when read signal from button press which should trigger when we send close signal
+      closeTime = millis();
+    }
   }
 }
 
@@ -142,6 +160,8 @@ void loop()
   // Read sensors and upate display
   if (millis() - statsTimer >= 10000) {
     readAndRefresh();
+
+    actionOnCO2();
     
     statsTimer = millis();
   }
