@@ -1,9 +1,15 @@
 /*
  * # Libraries
+ *
+ * EspSoftwareSerial by Dirk Kaar, Peter Lerup
  * https://github.com/plerup/espsoftwareserial/
+ * MH-Z19 by Jonathan Dempsey
  * https://github.com/WifWaf/MH-Z19/blob/master/examples/RetrieveDeviceInfo/RetrieveDeviceInfo.ino
+ * GFX Library for Arduino by Moon On Our Nation
  * https://github.com/moononournation/Arduino_GFX/blob/master/examples/HelloWorld/HelloWorld.ino
+ * FTDebouncer by Ubi de Feo
  * https://github.com/ubidefeo/FTDebouncer
+ * DHT sensor library by Adafruit 
  * https://github.com/adafruit/DHT-sensor-library
  */
 
@@ -35,7 +41,7 @@ int humidityOffset = 0;
 
 // Display
 Arduino_DataBus *bus = new Arduino_ESP32SPI(27 /* DC */, -1 /* CS */, 14 /* SCK */, 13 /* MOSI */, -1 /* MISO */, VSPI /* spi_num */);
-Arduino_GFX *gfx = new Arduino_ST7789(bus, 12 /* RST */, 2 /* rotation */, true /* IPS */,
+Arduino_GFX *gfx = new Arduino_ST7789(bus, 12 /* RST */, 3 /* rotation */, true /* IPS */,
                                       240 /* width */, 240 /* height */, 0 /* col offset 1 */, 80 /* row offset 1 */);
 #define TFT_BL 26
 bool backlightState = true;
@@ -52,8 +58,6 @@ unsigned int co2Threshold = 1000;
 #define BTN_MIDDLE 5
 #define BTN_UP 19
 
-//bool btnOpenState = false;
-bool btnClose = false;
 unsigned long openTime = millis();
 unsigned long closeTime = millis();
 char timeDisplay[8];
@@ -121,12 +125,15 @@ void onPinActivated(int pinNumber){
       gfx->fillCircle(x + 20, y, 16, RED);
       break;
     case BTN_DOWN:
+      Serial.println("OPEN OUT HIGH");
       digitalWrite(OPEN_OUT, HIGH);
       break;
     case BTN_UP:
+      Serial.println("CLOSE OUT HIGH");
       digitalWrite(CLOSE_OUT, HIGH);
       break;
     case BTN_MIDDLE:
+      Serial.println("CLOSE AND OPEN LOW");
       digitalWrite(OPEN_OUT, LOW);
       digitalWrite(CLOSE_OUT, LOW);
       break;
