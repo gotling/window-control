@@ -20,6 +20,8 @@
 #include <DHT.h>
 #include <FTDebouncer.h>
 
+#include "fonts.h"
+
 // CO2 sensor
 #define RX_PIN 16                                          // Rx pin which the MHZ19 Tx pin is attached to
 #define TX_PIN 17                                          // Tx pin which the MHZ19 Rx pin is attached to
@@ -41,6 +43,8 @@ Arduino_GFX *gfx = new Arduino_ST7789(bus, 12 /* RST */, 3 /* rotation */, true 
 #define TFT_BL 26
 bool backlightState = true;
 unsigned int toastTime = 2000;
+#define PURPLE 0xA45F
+#define CYAN 0x4E3F
 
 // LED
 #define LED 2

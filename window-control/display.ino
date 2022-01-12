@@ -1,4 +1,5 @@
 char timeDisplay[8];
+char textDisplay[40];
 
 void setupDisplay() {
   gfx->begin();
@@ -14,85 +15,92 @@ void displayStartupScreen() {
   gfx->println(":)");
 }
 
+void printHeader(char *text, unsigned int x, unsigned int y) {
+  gfx->setFont(&URW_Gothic_L_Book_16);
+  gfx->setTextColor(PURPLE);
+  gfx->setTextSize(1);
+  gfx->setCursor(x, y);
+  gfx->println(text);
+}
+
+void printValue(unsigned int value, unsigned int x, unsigned int y) {
+  gfx->setFont(&URW_Gothic_L_Book_30);
+  gfx->setTextColor(LIGHTGREY);
+  gfx->setTextSize(1);
+  gfx->setCursor(x, y);
+  gfx->println(value);
+}
+
+void printTextLarge(char *text, unsigned int x, unsigned int y) {
+  gfx->setFont(&URW_Gothic_L_Book_30);
+  gfx->setTextColor(LIGHTGREY, BLACK);
+  gfx->setTextSize(1);
+  gfx->setCursor(x, y);
+  gfx->println(text);
+}
+
+void printTextSmall(char *text, unsigned int x, unsigned int y) {
+  gfx->setFont(&URW_Gothic_L_Book_16);
+  gfx->setTextColor(LIGHTGREY, BLACK);
+  gfx->setTextSize(1);
+  gfx->setCursor(x, y);
+  gfx->println(text);
+}
+
+void printSmallValueText(char *text, unsigned int x, unsigned int y) {
+  gfx->setFont(&URW_Gothic_L_Book_16);
+  gfx->setTextColor(LIGHTGREY);
+  gfx->setTextSize(1);
+  gfx->setCursor(x, y);
+  gfx->println(text);
+}
+
 // Most stats
 void refreshDisplay() {
   int x = 0;
-  int y = 0;
+  int y = 16;
 
   gfx->fillScreen(BLACK);
 
-  gfx->setTextColor(PURPLE);
-  gfx->setTextSize(2, 2, 0);
-  gfx->setCursor(x, y);
-  gfx->println("Current");
-  gfx->setCursor(x + 90, y);
-  gfx->println("Min");
-  gfx->setCursor(x + 160, y);
-  gfx->println("Max");
+  printHeader("Current", x, y);
+  printHeader("Min", x + 80, y);
+  printHeader("Max", x + 160, y);
+
+  y += 30;
+
+  printValue(CO2, x, y);
+  printValue(minCO, x + 80, y);
+  printValue(maxCO, x + 160, y);
+  gfx->setFont(NULL);
 
   y += 20;
 
-  gfx->setCursor(x, y);
-  gfx->setTextColor(LIGHTGREY);
-  gfx->setTextSize(3, 4, 0);
-  gfx->println(CO2);
-  gfx->setCursor(x + 90, y);
-  gfx->println(minCO);
-  gfx->setCursor(x + 160, y);
-  gfx->println(maxCO);
+  printHeader("Average", x, y);
+
+  y += 20;
+
+  printHeader("1 min", x, y);
+  printHeader("5 min", x + 80, y);
+  printHeader("15 min", x + 160, y);
+
+  y += 30;
+
+  printValue(a1, x, y);
+  printValue(a5, x + 80, y);
+  printValue(a15, x + 160, y);
 
   y += 40;
 
-  gfx->setCursor(x, y);
-  gfx->setTextColor(PURPLE);
-  gfx->setTextSize(2, 2, 0);
-
-  gfx->println("Average");
+  printHeader("Temp", x, y);
+  printHeader("Humidity", x + 120, y);
 
   y += 20;
 
-  gfx->setCursor(x, y);
-  gfx->println("1 min");
-  gfx->setCursor(x + 80, y);
-  gfx->println("5 min");
-  gfx->setCursor(x + 160, y);
-  gfx->println("15 min");
-
-  y += 20;
-
-  gfx->setCursor(x, y);
-  gfx->setTextColor(LIGHTGREY);
-  gfx->setTextSize(3, 4, 0);
-  gfx->println(a1);
-  gfx->setCursor(x + 80, y);
-  gfx->println(a5);
-  gfx->setCursor(x + 160, y);
-  gfx->println(a15);
-
-  y += 40;
-
-  gfx->setCursor(x, y);
-  gfx->setTextColor(PURPLE);
-  gfx->setTextSize(2, 2, 0);
-
-  gfx->println("Temp");
-
-  gfx->setCursor(x + 120, y);
-  gfx->println("Humidity");
-
-  y += 20;
-
-  gfx->setTextColor(LIGHTGREY);
-  gfx->setTextSize(2, 2, 0);
-  gfx->setCursor(x, y);
-  gfx->print(temperature);
-  gfx->print(" ");
-  gfx->print((char)247);
-  gfx->print("C");
+  sprintf(textDisplay, "%d \xB0 %cC\0", temperature, (char) 247);
+  printSmallValueText(textDisplay, x, y);
   
-  gfx->setCursor(x + 120, y);
-  gfx->print(humidity);
-  gfx->print(" %");
+  sprintf(textDisplay, "%d %%", humidity);
+  printSmallValueText(textDisplay, x + 120, y);
 
   refreshTime();
 }
@@ -100,56 +108,44 @@ void refreshDisplay() {
 // Window open display
 void windowOpenDisplay() {
   int x = 0;
-  int y = 0;
+  int y = 30;
 
   gfx->fillScreen(BLACK);
 
+  gfx->setFont(&URW_Gothic_L_Book_30);
   gfx->setTextColor(CYAN);
-  gfx->setTextSize(3, 4, 0);
   gfx->setCursor(x, y);
   gfx->println("Window Open");
 
-  y += 40;
+  y += 30;
   
-  gfx->setCursor(x, y);
-  gfx->setTextSize(2, 2, 0);
-  gfx->setTextColor(PURPLE);
-  gfx->println("Time");
+  printHeader("Time", x, y);
 
-  y += 20;
+  y += 30;
 
-  gfx->setCursor(x, y);
-  gfx->setTextColor(LIGHTGREY);
-  gfx->setTextSize(3, 4, 0);
   displayTime((millis() - openTime) / 1000, x, y, 3, 4);
 
-  y += 40;
+  y += 30;
 
-  gfx->setCursor(x, y);
-  gfx->setTextSize(2, 2, 0);
-  gfx->setTextColor(PURPLE);
-  gfx->println("CO2");
+  printHeader("CO2", x, y);
 
-  y += 20;
+  y += 30;
 
+  gfx->setFont(&URW_Gothic_L_Book_30);
   gfx->setCursor(x, y);
   gfx->setTextColor(LIGHTGREY);
-  gfx->setTextSize(3, 4, 0);
   gfx->print(a1);
   gfx->println(" ppm");
 
-  y += 40;
+  y += 30;
 
-  gfx->setCursor(x, y);
-  gfx->setTextSize(2, 2, 0);
-  gfx->setTextColor(PURPLE);
-  gfx->println("Temperature");
+  printHeader("Temperature", x, y);
 
-  y += 20;
+  y += 30;
 
+  gfx->setFont(&URW_Gothic_L_Book_30);
   gfx->setCursor(x, y);
   gfx->setTextColor(LIGHTGREY);
-  gfx->setTextSize(3, 4, 0);
   gfx->print(temperature);
   gfx->print(" ");
   gfx->print((char)247);
@@ -162,8 +158,8 @@ void windowClosingDisplay() {
 
   gfx->fillScreen(BLACK);
 
+  gfx->setFont(&URW_Gothic_L_Book_30);
   gfx->setTextColor(CYAN);
-  gfx->setTextSize(3, 4, 0);
   gfx->setCursor(x, y);
   gfx->println("Closing");
   gfx->println("window..");
@@ -175,24 +171,20 @@ void refreshTime() {
 
   if (displayState == displayStats) {  
     unsigned int x = 0;
-    unsigned int y = 200;
-
-    gfx->setCursor(x, y);
-    gfx->setTextColor(PURPLE, BLACK);
-    gfx->setTextSize(2, 2, 0);
+    unsigned int y = 210;
     
     if (windowOpen) {
-      gfx->print("Window open  ");
+      printHeader("Window open  ", x, y);
       diff = (millis() - openTime) / 1000;
       displayTime(diff, x, y + 20, 2, 2);
     } else {
-      gfx->print("Window closed");
+      printHeader("Window closed", x, y);
       diff = (millis() - closeTime) / 1000;
       displayTime(diff, x, y + 20, 2, 2);
     }
   } else if (displayState == displayWindowOpen) {
     diff = (millis() - openTime) / 1000;
-    displayTime(diff, 0, 60, 3, 4);
+    displayTime(diff, 0, 90, 3, 4);
   }
 }
 
@@ -204,9 +196,8 @@ void displayTime(unsigned long seconds, unsigned int x, unsigned int y, unsigned
   } else {
     sprintf(timeDisplay, "%d:%02d    \0", seconds / 60, seconds % 60);
   }
-
-  gfx->setTextSize(width, height, 0);
-  gfx->setTextColor(LIGHTGREY, BLACK);
-  gfx->setCursor(x, y);
-  gfx->print(timeDisplay);
+  if (width > 2)
+    printTextLarge(timeDisplay, x, y);
+  else
+    printTextSmall(timeDisplay, x, y);
 }
