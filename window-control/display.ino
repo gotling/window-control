@@ -58,7 +58,7 @@ void printSmallValueText(char *text, unsigned int x, unsigned int y) {
 // Most stats
 void refreshDisplay() {
   displayState = displayStats;
-  
+
   int x = 0;
   int y = 16;
 
@@ -98,7 +98,7 @@ void refreshDisplay() {
 
   y += 20;
 
-  sprintf(textDisplay, "%d \xB0 %cC\0", temperature, (char) 247);
+  sprintf(textDisplay, "%d %cC\0", temperature, (char) 0x7E);
   printSmallValueText(textDisplay, x, y);
   
   sprintf(textDisplay, "%d %%", humidity);
@@ -152,7 +152,7 @@ void windowOpenDisplay() {
   gfx->setTextColor(LIGHTGREY);
   gfx->print(temperature);
   gfx->print(" ");
-  gfx->print((char)247);
+  gfx->print((char)0x7E);
   gfx->println("C");
 }
 
