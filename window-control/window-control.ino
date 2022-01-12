@@ -46,6 +46,12 @@ unsigned int toastTime = 2000;
 #define PURPLE 0xA45F
 #define CYAN 0x4E3F
 
+// setting PWM properties
+const int freq = 5000;
+const int ledChannel = 0;
+const int resolution = 8;
+
+
 // LED
 #define LED 2
 
@@ -100,7 +106,6 @@ void refreshLED() {
 }
 
 void closeWindows() {
-  displayState = displayWindowClosing;
   windowClosingDisplay();
 
   digitalWrite(CLOSE_OUT, HIGH);
@@ -161,6 +166,11 @@ void setup()
   // Display
   setupDisplay();
 
+  // Set display brightness
+  ledcSetup(ledChannel, freq, resolution);
+  ledcAttachPin(TFT_BL, ledChannel);
+  ledcWrite(ledChannel, 128);
+
   displayStartupScreen();
 
   // Input buttons
@@ -199,7 +209,6 @@ void loop()
 
   // Reset display to default
   if (displayState == displayWindowClosing && (millis() - closeTime) > toastTime) {
-    displayState = displayStats;
     refreshDisplay();
   }
 }

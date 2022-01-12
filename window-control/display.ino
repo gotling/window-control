@@ -57,6 +57,8 @@ void printSmallValueText(char *text, unsigned int x, unsigned int y) {
 
 // Most stats
 void refreshDisplay() {
+  displayState = displayStats;
+  
   int x = 0;
   int y = 16;
 
@@ -107,6 +109,8 @@ void refreshDisplay() {
 
 // Window open display
 void windowOpenDisplay() {
+  displayState = displayWindowOpen;
+
   int x = 0;
   int y = 30;
 
@@ -153,6 +157,7 @@ void windowOpenDisplay() {
 }
 
 void windowClosingDisplay() {
+  displayState = displayWindowClosing;
   int x = 0;
   int y = 100;
 
