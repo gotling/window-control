@@ -4,6 +4,8 @@ Control automatic windows based on sensor data or time.
 
 Hardware hooks in parallel to existing buttons used to control windows.
 
+![Circuit bords](circuit-boards.jpg)
+
 # Hardware
 
 ESP32.
@@ -20,7 +22,17 @@ MOSFET for allowing 24v signal to pass trough, emulating button press.
 
 # Software
 
-Written in Arduino IDE, C code.
+Written in Arduino IDE 2.0.
+
+Coded in C.
+
+**Extra Fonts**
+
+http://oleddisplay.squix.ch/
+
+**Modifying font**
+
+https://tchapi.github.io/Adafruit-GFX-Font-Customiser/
 
 # Libraries
 
