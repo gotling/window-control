@@ -68,7 +68,8 @@ FTDebouncer pinDebouncer;
 // Configuration
 unsigned int co2UpperThreshold = 1000;
 unsigned int co2LowerThreshold = 900;
-unsigned long openTimeThreshold = 60000;
+unsigned long openTimeUpperThreshold = 120000;
+unsigned long openTimeLowerThreshold = 60000;
 
 // Stats
 enum {
@@ -120,11 +121,11 @@ void closeWindows() {
 }
 
 void actionOnCO2() {
-  if (windowOpen && (millis() - openTime) > openTimeThreshold) {
-    if (a1 <= co2LowerThreshold) {
-      // Good CO2 level reached, close windows by sending button press
+  if (windowOpen) {
+    unsigned long diff = millis() - openTime;
+    
+    if (diff > openTimeUpperThreshold || (diff > openTimeLowerThreshold && a1 <= co2LowerThreshold))
       closeWindows();
-    }
   }
 }
 
