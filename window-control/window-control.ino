@@ -110,15 +110,26 @@ void refreshLED() {
   }
 }
 
-void closeWindows() {
-  windowClosingDisplay();
+void openWindow() {
+  Serial.println("OPEN OUT HIGH");
+  windowOpen = true;
+  openTime = millis();
+  windowOpenDisplay();
+  
+  digitalWrite(OPEN_OUT, HIGH);
+  delay(100);
+  digitalWrite(OPEN_OUT, LOW);
+}
 
+void closeWindow() {
+  Serial.println("CLOSE OUT HIGH");
+  windowOpen = false;
+  closeTime = millis();
+  windowClosingDisplay();
+  
   digitalWrite(CLOSE_OUT, HIGH);
   delay(100);
   digitalWrite(CLOSE_OUT, LOW);
-  Serial.println("Sent windows close trigger");
-  windowOpen = false; // TODO: Remove this when read signal from button press which should trigger when we send close signal
-  closeTime = millis();  
 }
 
 void actionOnCO2() {
@@ -126,7 +137,7 @@ void actionOnCO2() {
     unsigned long diff = millis() - openTime;
     
     if (diff > openTimeUpperThreshold || (diff > openTimeLowerThreshold && a1 <= co2LowerThreshold))
-      closeWindows();
+      closeWindow();
   }
 }
 

@@ -26,27 +26,20 @@ void onPinActivated(int pinNumber) {
     case displayStats:
       switch (pinNumber) {
         case BTN_UP:
-          Serial.println("OPEN OUT HIGH");
-          windowOpen = true;
-          openTime = millis();
-          windowOpenDisplay();
-          
-          digitalWrite(OPEN_OUT, HIGH);
-          delay(100);
-          digitalWrite(OPEN_OUT, LOW);
+          openWindow();
           break;
         case BTN_DOWN:
-          Serial.println("CLOSE OUT HIGH");
-          windowOpen = false;
-          closeTime = millis();
-          windowClosingDisplay();
-          
-          digitalWrite(CLOSE_OUT, HIGH);
-          delay(100);
-          digitalWrite(CLOSE_OUT, LOW);
+          closeWindow();
           break;
         case BTN_MIDDLE:
           preferencesDisplay();
+          break;
+      }
+      break;
+    case displayWindowOpen:
+      switch (pinNumber) {
+        case BTN_DOWN:
+          closeWindow();
           break;
       }
       break;
