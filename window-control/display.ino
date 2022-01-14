@@ -177,17 +177,28 @@ void windowClosingDisplay() {
 // unsigned long openTimeLowerThreshold = 60000;
 
 unsigned short pIndex = 0;
+unsigned short pSelected = false;
+
+typedef enum {
+	BACK,
+	TEXT,
+	NUMBER
+} MenuItemType;
 
 typedef struct {
+  MenuItemType type;
 	const char *name;
 	unsigned int *value;
+  const char *text;
 } MenuItem;
 
 MenuItem menuItems[] {
-  {.name = "CO2 Upper", .value = &co2UpperThreshold},
-  {.name = "CO2 Lower", .value = &co2LowerThreshold},
-  {.name = "Max Open Time", .value = &openTimeUpperThreshold},
-  {.name = "Min Open Time", .value = &openTimeLowerThreshold},
+  {.type = BACK, .name = "Back", .value = NULL, .text = "Go Back"},
+  {.type = TEXT, .name = "Mode", .value = NULL, .text = "CO2+Time"},
+  {.type = NUMBER, .name = "CO2 Upper", .value = &co2UpperThreshold, .text = NULL},
+  {.type = NUMBER, .name = "CO2 Lower", .value = &co2LowerThreshold, .text = NULL},
+  {.type = NUMBER, .name = "Max Open Time (min)", .value = &openTimeUpperThreshold, .text = NULL},
+  {.type = NUMBER, .name = "Min Open Time (min)", .value = &openTimeLowerThreshold, .text = NULL},
 };
 
 void preferencesDisplay() {
@@ -202,18 +213,20 @@ void preferencesDisplay() {
   gfx->setCursor(x, y);
   gfx->println("Preferences");
 
-  y += 20;
-  printHeader("Mode", x, y);
-  y += 30;
-  printTextLarge("CO2+Time", x, y);
-
-  for (int i=0; i < sizeof(menuItems)/sizeof(MenuItem); i++) {
+  for (int i=pIndex; i < sizeof(menuItems)/sizeof(MenuItem); i++) {
     y += 20;
     printHeader(menuItems[i].name, x, y);
     y += 30;
-    printValue(*menuItems[i].value, x, y);
+    if (menuItems[i].type == NUMBER)
+      printValue(*menuItems[i].value, x, y);
+    else
+      printTextLarge(menuItems[i].text, x, y);
+
     if (i == pIndex) {
-      printTextLarge("<", 200, y);
+      if (pSelected)
+        printTextLarge("+-", 200, y);
+      else
+        printTextLarge("<", 200, y);
     }
   }
 }
@@ -233,7 +246,11 @@ void preferencesHandleButtons(int button) {
       }  
       break;
     case BTN_MIDDLE:
-      refreshDisplay();
+      if (pIndex == 0)
+        refreshDisplay();
+      else
+        pSelected = !pSelected;
+        preferencesDisplay();
     break;
   }
 }
