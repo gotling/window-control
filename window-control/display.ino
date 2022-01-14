@@ -170,6 +170,74 @@ void windowClosingDisplay() {
   gfx->println("window..");
 }
 
+// mode
+// unsigned int co2UpperThreshold = 1000;
+// unsigned int co2LowerThreshold = 900;
+// unsigned long openTimeUpperThreshold = 120000;
+// unsigned long openTimeLowerThreshold = 60000;
+
+unsigned short pIndex = 0;
+
+typedef struct {
+	const char *name;
+	unsigned int *value;
+} MenuItem;
+
+MenuItem menuItems[] {
+  {.name = "CO2 Upper", .value = &co2UpperThreshold},
+  {.name = "CO2 Lower", .value = &co2LowerThreshold},
+  {.name = "Max Open Time", .value = &openTimeUpperThreshold},
+  {.name = "Min Open Time", .value = &openTimeLowerThreshold},
+};
+
+void preferencesDisplay() {
+  displayState = displayPreferences;
+  int x = 0;
+  int y = 30;
+
+  gfx->fillScreen(BLACK);
+
+  gfx->setFont(&URW_Gothic_L_Book_30);
+  gfx->setTextColor(CYAN);
+  gfx->setCursor(x, y);
+  gfx->println("Preferences");
+
+  y += 20;
+  printHeader("Mode", x, y);
+  y += 30;
+  printTextLarge("CO2+Time", x, y);
+
+  for (int i=0; i < sizeof(menuItems)/sizeof(MenuItem); i++) {
+    y += 20;
+    printHeader(menuItems[i].name, x, y);
+    y += 30;
+    printValue(*menuItems[i].value, x, y);
+    if (i == pIndex) {
+      printTextLarge("<", 200, y);
+    }
+  }
+}
+
+void preferencesHandleButtons(int button) {
+  switch (button) {
+    case BTN_UP:
+      if (pIndex > 0) {
+        pIndex--;
+        preferencesDisplay();
+      }  
+      break;
+    case BTN_DOWN:
+      if (pIndex < sizeof(menuItems)/sizeof(MenuItem) -1) {
+        pIndex++;
+        preferencesDisplay();
+      }  
+      break;
+    case BTN_MIDDLE:
+      refreshDisplay();
+    break;
+  }
+}
+
 // Refresh that happens often
 void refreshTime() {
   long diff;

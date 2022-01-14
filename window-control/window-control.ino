@@ -68,14 +68,15 @@ FTDebouncer pinDebouncer;
 // Configuration
 unsigned int co2UpperThreshold = 1000;
 unsigned int co2LowerThreshold = 900;
-unsigned long openTimeUpperThreshold = 120000;
-unsigned long openTimeLowerThreshold = 60000;
+unsigned int openTimeUpperThreshold = 120000;
+unsigned int openTimeLowerThreshold = 60000;
 
 // Stats
 enum {
   displayStats,
   displayWindowOpen,
-  displayWindowClosing
+  displayWindowClosing,
+  displayPreferences
 } displayState = displayStats;
 
 unsigned long statsTimer = 0;
@@ -144,6 +145,9 @@ void readAndRefresh() {
     case displayWindowClosing:
       windowClosingDisplay();
       break;
+    case displayPreferences:
+      preferencesDisplay();
+      break;      
     default:
       refreshDisplay();
       break;

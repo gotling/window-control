@@ -15,12 +15,45 @@ void setupButtons() {
 }
 
 // Button pressed
-void onPinActivated(int pinNumber){
+void onPinActivated(int pinNumber) {
   unsigned int x = 200;
   unsigned int y = 220;
 
   Serial.print("buttonPress: ");
   Serial.println(pinNumber);
+
+  switch(displayState) {
+    case displayStats:
+      switch (pinNumber) {
+        case BTN_UP:
+          Serial.println("OPEN OUT HIGH");
+          windowOpen = true;
+          openTime = millis();
+          windowOpenDisplay();
+          
+          digitalWrite(OPEN_OUT, HIGH);
+          delay(100);
+          digitalWrite(OPEN_OUT, LOW);
+          break;
+        case BTN_DOWN:
+          Serial.println("CLOSE OUT HIGH");
+          windowOpen = false;
+          closeTime = millis();
+          windowClosingDisplay();
+          
+          digitalWrite(CLOSE_OUT, HIGH);
+          delay(100);
+          digitalWrite(CLOSE_OUT, LOW);
+          break;
+        case BTN_MIDDLE:
+          preferencesDisplay();
+          break;
+      }
+      break;
+    case displayPreferences:
+      preferencesHandleButtons(pinNumber);
+      break;
+  }
 
   switch (pinNumber) {
     case BTN_OPEN:
@@ -32,31 +65,6 @@ void onPinActivated(int pinNumber){
       closeTime = millis();
       windowOpen = false;
       gfx->fillCircle(x + 20, y, 16, RED);
-      break;
-    case BTN_UP:
-      Serial.println("OPEN OUT HIGH");
-      windowOpen = true;
-      openTime = millis();
-      windowOpenDisplay();
-      
-      digitalWrite(OPEN_OUT, HIGH);
-      delay(100);
-      digitalWrite(OPEN_OUT, LOW);
-      break;
-    case BTN_DOWN:
-      Serial.println("CLOSE OUT HIGH");
-      windowOpen = false;
-      closeTime = millis();
-      windowClosingDisplay();
-      
-      digitalWrite(CLOSE_OUT, HIGH);
-      delay(100);
-      digitalWrite(CLOSE_OUT, LOW);
-      break;
-    case BTN_MIDDLE:
-      Serial.println("CLOSE AND OPEN LOW");
-      digitalWrite(OPEN_OUT, LOW);
-      digitalWrite(CLOSE_OUT, LOW);
       break;
   }
 }
