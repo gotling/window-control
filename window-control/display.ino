@@ -248,9 +248,10 @@ void preferencesHandleButtons(int button) {
     case BTN_MIDDLE:
       if (pIndex == 0)
         refreshDisplay();
-      else
+      else {
         pSelected = !pSelected;
         preferencesDisplay();
+      }
     break;
   }
 }
