@@ -15,7 +15,7 @@ void displayStartupScreen() {
   gfx->println(":)");
 }
 
-void printHeader(char *text, unsigned int x, unsigned int y) {
+void printHeader(const char *text, unsigned int x, unsigned int y) {
   gfx->setFont(&URW_Gothic_L_Book_16);
   gfx->setTextColor(PURPLE);
   gfx->setTextSize(1);
@@ -31,7 +31,7 @@ void printValue(unsigned int value, unsigned int x, unsigned int y) {
   gfx->println(value);
 }
 
-void printTextLarge(char *text, unsigned int x, unsigned int y) {
+void printTextLarge(const char *text, unsigned int x, unsigned int y) {
   gfx->setFont(&URW_Gothic_L_Book_30);
   gfx->setTextColor(LIGHTGREY, BLACK);
   gfx->setTextSize(1);
@@ -39,7 +39,7 @@ void printTextLarge(char *text, unsigned int x, unsigned int y) {
   gfx->println(text);
 }
 
-void printTextSmall(char *text, unsigned int x, unsigned int y) {
+void printTextSmall(const char *text, unsigned int x, unsigned int y) {
   gfx->setFont(&URW_Gothic_L_Book_16);
   gfx->setTextColor(LIGHTGREY, BLACK);
   gfx->setTextSize(1);
@@ -47,7 +47,7 @@ void printTextSmall(char *text, unsigned int x, unsigned int y) {
   gfx->println(text);
 }
 
-void printSmallValueText(char *text, unsigned int x, unsigned int y) {
+void printSmallValueText(const char *text, unsigned int x, unsigned int y) {
   gfx->setFont(&URW_Gothic_L_Book_16);
   gfx->setTextColor(LIGHTGREY);
   gfx->setTextSize(1);

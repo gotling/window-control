@@ -40,10 +40,13 @@ int humidityOffset = 0;
 Arduino_DataBus *bus = new Arduino_ESP32SPI(27 /* DC */, -1 /* CS */, 14 /* SCK */, 13 /* MOSI */, -1 /* MISO */, VSPI /* spi_num */);
 Arduino_GFX *gfx = new Arduino_ST7789(bus, 12 /* RST */, 3 /* rotation */, true /* IPS */,
                                       240 /* width */, 240 /* height */, 0 /* col offset 1 */, 80 /* row offset 1 */);
+#undef TFT_BL
 #define TFT_BL 26
 bool backlightState = true;
 unsigned int toastTime = 2000;
+#undef PURPLE
 #define PURPLE 0xA45F
+#undef CYAN
 #define CYAN 0x4E3F
 
 // setting PWM properties
