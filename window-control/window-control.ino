@@ -14,6 +14,7 @@
  */
 
 #include <Arduino.h>
+#include <Preferences.h>
 #include "MHZ19.h"
 #include <SoftwareSerial.h>                                // Remove if using HardwareSerial
 #include <Arduino_GFX_Library.h>
@@ -66,6 +67,8 @@ FTDebouncer pinDebouncer;
 #define CLOSE_OUT 32
 
 // Configuration
+Preferences preferences;
+
 unsigned int co2UpperThreshold = 1000;
 unsigned int co2LowerThreshold = 900;
 unsigned int openTimeUpperThreshold = 2; //120000;
@@ -171,6 +174,14 @@ void readAndRefresh() {
 void setup()
 {
   Serial.begin(115200);
+
+  // Configuration
+  preferences.begin("settings", true);
+  co2UpperThreshold = preferences.getUInt("co2Max", 1000);
+  co2LowerThreshold = preferences.getUInt("co2Min", 900);
+  openTimeUpperThreshold = preferences.getUInt("openMax", 2);
+  openTimeLowerThreshold = preferences.getUInt("openMin", 1);
+  preferences.end();
 
   // CO2 sensor
   setupMHZ19();

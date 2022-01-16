@@ -213,7 +213,13 @@ void preferencesDisplay() {
   gfx->setCursor(x, y);
   gfx->println("Preferences");
 
-  for (int i=pIndex; i < sizeof(menuItems)/sizeof(MenuItem); i++) {
+  int i = 0;  
+
+  if (pIndex > 1) {
+    i = pIndex-1;
+  }
+
+  for (i; i < sizeof(menuItems)/sizeof(MenuItem); i++) {
     y += 20;
     printHeader(menuItems[i].name, x, y);
     y += 30;
@@ -223,15 +229,78 @@ void preferencesDisplay() {
       printTextLarge(menuItems[i].text, x, y);
 
     if (i == pIndex) {
-      if (pSelected)
-        printTextLarge("+-", 200, y);
-      else
+      if (pSelected) {
+        printTextLarge("+", 200, 60);
+        printTextLarge("!", 200, 140);
+        printTextLarge("-", 200, 220);
+      } else
         printTextLarge("<", 200, y);
     }
   }
 }
 
+void increaseValue() {
+  int i = pIndex;
+  
+  if (menuItems[i].type != NUMBER)
+    return;
+  
+  int value = *menuItems[i].value;  
+  if (value >= 100) {
+    *menuItems[i].value = value + 100;    
+  } else {
+    *menuItems[i].value = value + 1;
+  }
+}
+
+void decreaseValue() {
+  int i = pIndex;
+
+  if (menuItems[i].type != NUMBER)
+    return;
+
+  int value = *menuItems[i].value;  
+  if (value <= 0) {
+    *menuItems[i].value = 0;
+  } else if (value <= 100) {
+    *menuItems[i].value = value - 1;    
+  } else {
+    *menuItems[i].value = value - 100;
+  }
+}
+
+void preferencesSelectedButtons(int button) {
+  switch (button) {
+    case BTN_UP:
+      // Increase
+      increaseValue();
+      break;
+    case BTN_DOWN:
+      // Decrease
+      decreaseValue();
+      break;
+    case BTN_MIDDLE:
+      // Save
+      pSelected = false;
+      break;
+  }
+
+  preferencesDisplay();
+}
+
+void preferencesSave() {
+  preferences.begin("settings", false);
+  preferences.putUInt("co2Max", co2UpperThreshold);
+  preferences.putUInt("co2Min", co2LowerThreshold);
+  preferences.putUInt("openMax", openTimeUpperThreshold);
+  preferences.putUInt("openMin", openTimeLowerThreshold);
+  preferences.end();
+}
+
 void preferencesHandleButtons(int button) {
+  if (pSelected)
+    return preferencesSelectedButtons(button);
+
   switch (button) {
     case BTN_UP:
       if (pIndex > 0) {
@@ -246,13 +315,15 @@ void preferencesHandleButtons(int button) {
       }  
       break;
     case BTN_MIDDLE:
-      if (pIndex == 0)
+      if (pIndex == 0) {
+        // Close preferences
+        preferencesSave();
         refreshDisplay();
-      else {
+      } else {
         pSelected = !pSelected;
         preferencesDisplay();
       }
-    break;
+      break;
   }
 }
 
