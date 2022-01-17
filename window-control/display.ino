@@ -178,6 +178,7 @@ void windowClosingDisplay() {
 
 unsigned short pIndex = 0;
 unsigned short pSelected = false;
+bool pChanged = false;
 
 typedef enum {
 	BACK,
@@ -251,6 +252,9 @@ void increaseValue() {
   } else {
     *menuItems[i].value = value + 1;
   }
+
+  if (value != *menuItems[i].value)
+    pChanged = true;
 }
 
 void decreaseValue() {
@@ -267,6 +271,9 @@ void decreaseValue() {
   } else {
     *menuItems[i].value = value - 100;
   }
+
+  if (value != *menuItems[i].value)
+    pChanged = true;
 }
 
 void preferencesSelectedButtons(int button) {
@@ -289,12 +296,16 @@ void preferencesSelectedButtons(int button) {
 }
 
 void preferencesSave() {
-  preferences.begin("settings", false);
-  preferences.putUInt("co2Max", co2UpperThreshold);
-  preferences.putUInt("co2Min", co2LowerThreshold);
-  preferences.putUInt("openMax", openTimeUpperThreshold);
-  preferences.putUInt("openMin", openTimeLowerThreshold);
-  preferences.end();
+  if (pChanged) {
+    preferences.begin("settings", false);
+    preferences.putUInt("co2Max", co2UpperThreshold);
+    preferences.putUInt("co2Min", co2LowerThreshold);
+    preferences.putUInt("openMax", openTimeUpperThreshold);
+    preferences.putUInt("openMin", openTimeLowerThreshold);
+    preferences.end();
+    pChanged = false;
+    Serial.println("Preferences saved");
+  }
 }
 
 void preferencesHandleButtons(int button) {
