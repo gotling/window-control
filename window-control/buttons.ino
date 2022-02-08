@@ -63,7 +63,7 @@ void onPinActivated(int pinNumber) {
 }
 
 // Button released
-void onPinDeactivated(int pinNumber){
+void onPinDeactivated(int pinNumber) {
   unsigned int x = 200;
   unsigned int y = 220;
 
