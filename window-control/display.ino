@@ -98,7 +98,7 @@ void refreshDisplay() {
 
   y += 20;
 
-  sprintf(textDisplay, "%d %cC\0", temperature, (char) 0x7E);
+  sprintf(textDisplay, "%.1f %cC\0", temperature, (char) 0x7E);
   printSmallValueText(textDisplay, x, y);
   
   sprintf(textDisplay, "%d %%", humidity);
@@ -150,10 +150,8 @@ void windowOpenDisplay() {
   gfx->setFont(&URW_Gothic_L_Book_30);
   gfx->setCursor(x, y);
   gfx->setTextColor(LIGHTGREY);
-  gfx->print(temperature);
-  gfx->print(" ");
-  gfx->print((char)0x7E);
-  gfx->println("C");
+  sprintf(textDisplay, "%.1f %cC\0", temperature, (char) 0x7E);
+  gfx->println(textDisplay);
 }
 
 void windowClosingDisplay() {

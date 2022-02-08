@@ -32,7 +32,7 @@ SoftwareSerial mySerial(RX_PIN, TX_PIN);                   // (Uno example) crea
 
 // DHT temperature and humidity
 #define DHTPIN 15
-#define DHTTYPE DHT11
+#define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
 int temperatureOffset = 0;
 int humidityOffset = 0;
@@ -102,7 +102,7 @@ bool windowOpen = false;
 unsigned int a1;
 unsigned int a5;
 unsigned int a15;
-int temperature;
+float temperature;
 unsigned int humidity;
 
 void refreshLED() {
