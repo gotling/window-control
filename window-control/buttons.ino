@@ -19,6 +19,13 @@ void onPinActivated(int pinNumber) {
   unsigned int x = 200;
   unsigned int y = 220;
 
+  lastActionTime = millis();
+  if (tftBrightness == 0) {
+    tftBrightness = TFT_BRIGHTNESS;
+    ledcWrite(ledChannel, tftBrightness);
+    return;
+  }
+
   Serial.print("buttonPress: ");
   Serial.println(pinNumber);
 

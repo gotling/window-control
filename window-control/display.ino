@@ -3,8 +3,6 @@ char textDisplay[40];
 
 void setupDisplay() {
   gfx->begin();
-  pinMode(TFT_BL, OUTPUT);
-  digitalWrite(TFT_BL, backlightState);
 }
 
 void displayStartupScreen() {

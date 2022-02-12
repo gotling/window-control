@@ -43,7 +43,8 @@ Arduino_GFX *gfx = new Arduino_ST7789(bus, 12 /* RST */, 3 /* rotation */, true 
                                       240 /* width */, 240 /* height */, 0 /* col offset 1 */, 80 /* row offset 1 */);
 #undef TFT_BL
 #define TFT_BL 26
-bool backlightState = true;
+#define TFT_BRIGHTNESS 128
+short tftBrightness = TFT_BRIGHTNESS;
 unsigned int toastTime = 2000;
 #undef PURPLE
 #define PURPLE 0xA45F
@@ -54,7 +55,6 @@ unsigned int toastTime = 2000;
 const int freq = 5000;
 const int ledChannel = 0;
 const int resolution = 8;
-
 
 // LED
 #define LED 2
@@ -95,6 +95,7 @@ unsigned int avg15[90];
 
 unsigned long openTime = millis();
 unsigned long closeTime = millis();
+unsigned long lastActionTime = millis();
 
 // State
 unsigned int CO2;
@@ -199,7 +200,7 @@ void setup()
   // Set display brightness
   ledcSetup(ledChannel, freq, resolution);
   ledcAttachPin(TFT_BL, ledChannel);
-  ledcWrite(ledChannel, 128);
+  ledcWrite(ledChannel, TFT_BRIGHTNESS);
 
   displayStartupScreen();
 
@@ -220,6 +221,12 @@ void setup()
 void loop()
 {
   pinDebouncer.update();
+
+  // Screen timout / Blank screen
+  if (tftBrightness > 0 && (millis() - lastActionTime >= screenTimeout)) {
+    tftBrightness = 0;
+    ledcWrite(ledChannel, tftBrightness);
+  }
 
   // Update time display  
   if (millis() - secondTimer >= 500) {
