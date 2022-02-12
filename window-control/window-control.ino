@@ -69,10 +69,12 @@ FTDebouncer pinDebouncer;
 // Configuration
 Preferences preferences;
 
-unsigned int co2UpperThreshold = 1000;
-unsigned int co2LowerThreshold = 900;
-unsigned int openTimeUpperThreshold = 2; //120000;
-unsigned int openTimeLowerThreshold = 1; //60000;
+int screenTimeout = 60000; // Milliseconds
+int mode = 0;
+int co2UpperThreshold = 1000;
+int co2LowerThreshold = 900;
+int openTimeUpperThreshold = 2; //120000;
+int openTimeLowerThreshold = 1; //60000;
 
 // Stats
 enum {
@@ -106,6 +108,11 @@ unsigned int a15;
 float temperature;
 unsigned int humidity;
 
+typedef enum {
+  OFF,
+  CO2TIME
+} ModeType;
+
 void refreshLED() {
   if (a1 >= co2UpperThreshold) {
     digitalWrite(LED, HIGH);
@@ -137,7 +144,7 @@ void closeWindow() {
 }
 
 void actionOnCO2() {
-  if (windowOpen) {
+  if (mode != OFF && windowOpen) {
     unsigned long diff = (millis() - openTime) / 60000;
     
     if (diff > openTimeUpperThreshold || (diff > openTimeLowerThreshold && a1 <= co2LowerThreshold))
@@ -178,10 +185,11 @@ void setup()
 
   // Configuration
   preferences.begin("settings", true);
-  co2UpperThreshold = preferences.getUInt("co2Max", 1000);
-  co2LowerThreshold = preferences.getUInt("co2Min", 900);
-  openTimeUpperThreshold = preferences.getUInt("openMax", 2);
-  openTimeLowerThreshold = preferences.getUInt("openMin", 1);
+  mode = preferences.getInt("mode", 0);
+  co2UpperThreshold = preferences.getInt("co2Max", 1000);
+  co2LowerThreshold = preferences.getInt("co2Min", 900);
+  openTimeUpperThreshold = preferences.getInt("openMax", 2);
+  openTimeLowerThreshold = preferences.getInt("openMin", 1);
   preferences.end();
 
   // CO2 sensor
@@ -246,6 +254,11 @@ void loop()
 
   // Reset display to default
   if (displayState == displayWindowClosing && (millis() - closeTime) > toastTime) {
+    refreshDisplay();
+  }
+
+  // Return to main view automatically after windows opened if mode is off
+  if (mode == OFF && displayState == displayWindowOpen && (millis() - openTime) > toastTime) {
     refreshDisplay();
   }
 }

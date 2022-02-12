@@ -166,37 +166,44 @@ void windowClosingDisplay() {
   gfx->println("window..");
 }
 
-// mode
-// unsigned int co2UpperThreshold = 1000;
-// unsigned int co2LowerThreshold = 900;
-// unsigned long openTimeUpperThreshold = 120000;
-// unsigned long openTimeLowerThreshold = 60000;
-
 unsigned short pIndex = 0;
 unsigned short pSelected = false;
 bool pChanged = false;
+char buf[12];
 
 typedef enum {
 	BACK,
 	TEXT,
+  ENUM,
 	NUMBER
 } MenuItemType;
 
 typedef struct {
   MenuItemType type;
 	const char *name;
-	unsigned int *value;
+	int *value;
   const char *text;
 } MenuItem;
 
 MenuItem menuItems[] {
   {.type = BACK, .name = "Back", .value = NULL, .text = "Go Back"},
-  {.type = TEXT, .name = "Mode", .value = NULL, .text = "CO2+Time"},
+  {.type = ENUM, .name = "Mode", .value = &mode, .text = NULL},
   {.type = NUMBER, .name = "CO2 Upper", .value = &co2UpperThreshold, .text = NULL},
   {.type = NUMBER, .name = "CO2 Lower", .value = &co2LowerThreshold, .text = NULL},
   {.type = NUMBER, .name = "Max Open Time (min)", .value = &openTimeUpperThreshold, .text = NULL},
   {.type = NUMBER, .name = "Min Open Time (min)", .value = &openTimeLowerThreshold, .text = NULL},
 };
+
+void enumToText(int value) {
+  Serial.print("VALUE: ");
+  Serial.println(value);
+  if (value == 0)
+    snprintf(buf, 12, "%s", "OFF");
+  else if (value == 1)
+    snprintf(buf, 12, "%s", "CO2+Time");
+  else
+    snprintf(buf, 12, "%s", "Unknown");
+}
 
 void preferencesDisplay() {
   displayState = displayPreferences;
@@ -222,7 +229,10 @@ void preferencesDisplay() {
     y += 30;
     if (menuItems[i].type == NUMBER)
       printValue(*menuItems[i].value, x, y);
-    else
+    else if (menuItems[i].type == ENUM) {
+      enumToText(*menuItems[i].value);
+      printTextLarge(buf, x, y);
+    } else
       printTextLarge(menuItems[i].text, x, y);
 
     if (i == pIndex) {
@@ -239,14 +249,21 @@ void preferencesDisplay() {
 void increaseValue() {
   int i = pIndex;
   
-  if (menuItems[i].type != NUMBER)
+  if (menuItems[i].type != NUMBER && menuItems[i].type  != ENUM)
     return;
   
-  int value = *menuItems[i].value;  
-  if (value >= 100) {
-    *menuItems[i].value = value + 100;    
-  } else {
+  int value = *menuItems[i].value;
+
+  if (menuItems[i].type == ENUM) {
     *menuItems[i].value = value + 1;
+    if (*menuItems[i].value > 1)
+      *menuItems[i].value = 1;
+  } else {
+    if (value >= 100) {
+      *menuItems[i].value = value + 100;    
+    } else {
+      *menuItems[i].value = value + 1;
+    }
   }
 
   if (value != *menuItems[i].value)
@@ -256,16 +273,23 @@ void increaseValue() {
 void decreaseValue() {
   int i = pIndex;
 
-  if (menuItems[i].type != NUMBER)
+  if (menuItems[i].type != NUMBER && menuItems[i].type  != ENUM)
     return;
 
-  int value = *menuItems[i].value;  
-  if (value <= 0) {
-    *menuItems[i].value = 0;
-  } else if (value <= 100) {
-    *menuItems[i].value = value - 1;    
+  int value = *menuItems[i].value;
+
+  if (menuItems[i].type == ENUM) {
+    *menuItems[i].value = value - 1;
+    if (*menuItems[i].value < 0)
+      *menuItems[i].value = 0;
   } else {
-    *menuItems[i].value = value - 100;
+    if (value <= 0) {
+      *menuItems[i].value = 0;
+    } else if (value <= 100) {
+      *menuItems[i].value = value - 1;    
+    } else {
+      *menuItems[i].value = value - 100;
+    }
   }
 
   if (value != *menuItems[i].value)
@@ -294,6 +318,7 @@ void preferencesSelectedButtons(int button) {
 void preferencesSave() {
   if (pChanged) {
     preferences.begin("settings", false);
+    preferences.putUInt("mode", mode);
     preferences.putUInt("co2Max", co2UpperThreshold);
     preferences.putUInt("co2Min", co2LowerThreshold);
     preferences.putUInt("openMax", openTimeUpperThreshold);
