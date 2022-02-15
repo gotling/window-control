@@ -11,6 +11,8 @@
  * https://github.com/ubidefeo/FTDebouncer
  * DHT sensor library by Adafruit 
  * https://github.com/adafruit/DHT-sensor-library
+ * PubSubClient by Nick O'Leary
+ * https://github.com/knolleary/pubsubclient
  */
 
 #include <Arduino.h>
@@ -20,6 +22,9 @@
 #include <Arduino_GFX_Library.h>
 #include <DHT.h>
 #include <FTDebouncer.h>
+#include <WiFiClientSecure.h>
+#include <WiFiManager.h>
+#include <PubSubClient.h>
 
 #include "fonts.h"
 
@@ -66,6 +71,11 @@ FTDebouncer pinDebouncer;
 #define OPEN_OUT 33
 #define CLOSE_OUT 32
 
+// Network
+WiFiManager wm;
+WiFiClientSecure client;
+PubSubClient mqtt(client);
+
 // Configuration
 Preferences preferences;
 
@@ -75,6 +85,18 @@ int co2UpperThreshold = 1000;
 int co2LowerThreshold = 900;
 int openTimeUpperThreshold = 2; //120000;
 int openTimeLowerThreshold = 1; //60000;
+
+#define MQTT_SERVER "io.adafruit.com"
+#define MQTT_PORT "8883"
+#define MQTT_USER ""
+#define MQTT_PASSWORD ""
+#define MQTT_TOPIC ""
+
+String mqttServer = MQTT_SERVER;
+String mqttPort = MQTT_PORT;
+String mqttUser = MQTT_USER;
+String mqttPassword = MQTT_PASSWORD;
+String mqttTopic = MQTT_TOPIC;
 
 // Stats
 enum {
@@ -98,6 +120,7 @@ unsigned int avg15[90];
 unsigned long openTime = millis();
 unsigned long closeTime = millis();
 unsigned long lastActionTime = millis();
+unsigned long mqttTime = -60000;
 
 // State
 unsigned int CO2;
@@ -191,6 +214,13 @@ void setup()
   openTimeUpperThreshold = preferences.getInt("openMax", 2);
   openTimeLowerThreshold = preferences.getInt("openMin", 1);
   preferences.end();
+  preferences.begin("mqtt", true);
+  mqttServer = preferences.getString("server", mqttServer);
+  mqttPort = preferences.getString("port", mqttPort);
+  mqttUser = preferences.getString("user", mqttUser);
+  mqttPassword = preferences.getString("password", mqttPassword);
+  mqttTopic = preferences.getString("topic", mqttTopic);
+  preferences.end();
 
   // CO2 sensor
   setupMHZ19();
@@ -221,6 +251,9 @@ void setup()
   digitalWrite(OPEN_OUT, HIGH);
   digitalWrite(CLOSE_OUT, HIGH);
 
+  // Setup WiFiManager
+  setupWiFi();
+  setupCustomParameters();
 
   // Read sensor data, log to serial and update display
   readAndRefresh();
@@ -230,6 +263,8 @@ void setup()
 void loop()
 {
   pinDebouncer.update();
+  wm.process();
+  mqtt.loop();
 
   // Screen timout / Blank screen
   if (tftBrightness > 0 && (millis() - lastActionTime >= screenTimeout)) {
@@ -244,13 +279,21 @@ void loop()
     secondTimer = millis();
   }
 
-  // Read sensors and upate display
+  // Read sensors and update display
   if (millis() - statsTimer >= 10000) {
     readAndRefresh();
 
     actionOnCO2();
     
     statsTimer = millis();
+  }
+
+  // Send to MQTT server
+  if (millis() - mqttTime >= 60000) {
+    if(WiFi.status() == WL_CONNECTED)
+      mqttSend();
+    
+    mqttTime = millis();
   }
 
   // Reset display to default
