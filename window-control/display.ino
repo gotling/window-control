@@ -318,11 +318,11 @@ void preferencesSelectedButtons(int button) {
 void preferencesSave() {
   if (pChanged) {
     preferences.begin("settings", false);
-    preferences.putUInt("mode", mode);
-    preferences.putUInt("co2Max", co2UpperThreshold);
-    preferences.putUInt("co2Min", co2LowerThreshold);
-    preferences.putUInt("openMax", openTimeUpperThreshold);
-    preferences.putUInt("openMin", openTimeLowerThreshold);
+    preferences.putInt("mode", mode);
+    preferences.putInt("co2Max", co2UpperThreshold);
+    preferences.putInt("co2Min", co2LowerThreshold);
+    preferences.putInt("openMax", openTimeUpperThreshold);
+    preferences.putInt("openMin", openTimeLowerThreshold);
     preferences.end();
     pChanged = false;
     Serial.println("Preferences saved");
