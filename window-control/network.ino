@@ -44,7 +44,8 @@ void setupWiFi() {
   else {
       Serial.println("Configuration portal running");
   }
-  wm.startConfigPortal();
+  //wm.startConfigPortal("Window Control");
+
 
   mqtt.setServer(mqttServer.c_str(), mqttPort.toInt());
 }
