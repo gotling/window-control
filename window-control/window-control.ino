@@ -150,9 +150,10 @@ void openWindow() {
   openTime = millis();
   windowOpenDisplay();
   
-  digitalWrite(OPEN_OUT, LOW);
-  delay(100);
   digitalWrite(OPEN_OUT, HIGH);
+  delay(100);
+  digitalWrite(OPEN_OUT, LOW);
+
 }
 
 void closeWindow() {
@@ -161,9 +162,10 @@ void closeWindow() {
   closeTime = millis();
   windowClosingDisplay();
   
-  digitalWrite(CLOSE_OUT, LOW);
-  delay(100);
   digitalWrite(CLOSE_OUT, HIGH);
+  delay(100);
+  digitalWrite(CLOSE_OUT, LOW);
+
 }
 
 void actionOnCO2() {
@@ -248,8 +250,8 @@ void setup()
   // Output MOSFET
   pinMode(OPEN_OUT, OUTPUT);
   pinMode(CLOSE_OUT, OUTPUT);
-  digitalWrite(OPEN_OUT, HIGH);
-  digitalWrite(CLOSE_OUT, HIGH);
+  digitalWrite(OPEN_OUT, LOW);
+  digitalWrite(CLOSE_OUT, LOW);
 
   // Setup WiFiManager
   setupWiFi();
