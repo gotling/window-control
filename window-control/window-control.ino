@@ -79,7 +79,7 @@ PubSubClient mqtt(client);
 // Configuration
 Preferences preferences;
 
-int screenTimeout = 60000; // Milliseconds
+int screenTimeout = 120000; // Milliseconds
 int mode = 0;
 int co2UpperThreshold = 1000;
 int co2LowerThreshold = 900;
