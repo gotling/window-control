@@ -61,12 +61,14 @@ void onPinActivated(int pinNumber) {
       windowOpen = true;
       windowOpenDisplay();
       gfx->fillCircle(x, y, 16, GREEN);
+      mqttSendEvent(RECEIVE_OPEN);
       break;
     case BTN_CLOSE:
       closeTime = millis();
       windowOpen = false;
       windowClosingDisplay();
       gfx->fillCircle(x + 20, y, 16, RED);
+      mqttSendEvent(RECEIVE_CLOSE);
       break;
   }
 }

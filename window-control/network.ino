@@ -105,3 +105,31 @@ void mqttSend() {
     }
   }
 }
+
+void mqttSendEvent(Event event) {
+  switch (event) {
+    case RECEIVE_OPEN:
+      sprintf(message, "receive,1\n");
+      break;
+    case RECEIVE_CLOSE:
+      sprintf(message, "receive,0\n");
+      break;
+    case SEND_OPEN:
+      sprintf(message, "send,1\n");
+      break;
+    case SEND_CLOSE:
+      sprintf(message, "send,0\n");
+      break;
+    default:
+      Serial.println("MQTT send event: Unknown Event");      
+  }
+  
+  if (mqttConnect()) {
+    if (mqtt.publish(mqttTopic.c_str(), message)) {
+      Serial.print("MQTT send event OK! ");
+      Serial.print(message);      
+    } else {
+      Serial.println("MQTT send event Failed"); 
+    }
+  }
+}

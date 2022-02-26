@@ -136,6 +136,13 @@ typedef enum {
   CO2TIME
 } ModeType;
 
+typedef enum {
+  RECEIVE_OPEN,
+  RECEIVE_CLOSE,
+  SEND_OPEN,
+  SEND_CLOSE
+} Event;
+
 void refreshLED() {
   if (a1 >= co2UpperThreshold) {
     digitalWrite(LED, HIGH);
@@ -154,6 +161,7 @@ void openWindow() {
   delay(100);
   digitalWrite(OPEN_OUT, LOW);
 
+  mqttSendEvent(SEND_OPEN);
 }
 
 void closeWindow() {
@@ -166,6 +174,7 @@ void closeWindow() {
   delay(100);
   digitalWrite(CLOSE_OUT, LOW);
 
+  mqttSendEvent(SEND_CLOSE);
 }
 
 void actionOnCO2() {
