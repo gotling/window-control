@@ -169,8 +169,8 @@ void closeWindow() {
 void actionOnCO2() {
   if (mode != OFF && windowOpen) {
     unsigned long diff = (millis() - openTime) / 60000;
-    
-    if (diff > openTimeUpperThreshold || (diff > openTimeLowerThreshold && a1 <= co2LowerThreshold))
+
+    if (diff >= openTimeUpperThreshold || (diff >= openTimeLowerThreshold && a1 <= co2LowerThreshold))
       closeWindow();
   }
 }
