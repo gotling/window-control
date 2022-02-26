@@ -50,6 +50,15 @@ void setupWiFi() {
 
   clientId = "ESP32Client-";
   clientId += String(random(0xffffff), HEX);
+  Serial.print("Client ID: ");
+  Serial.println(clientId.c_str());
+  Serial.println("DEBUG MQTT");
+  Serial.println(mqttServer);
+  Serial.println(mqttPort);
+  Serial.println(mqttUser);
+  Serial.println(mqttPassword);
+  Serial.println(mqttTopic);
+  Serial.println("END DEBUG MQTT");
 
   mqtt.setServer(mqttServer.c_str(), mqttPort.toInt());
 }
