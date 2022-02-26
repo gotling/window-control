@@ -1,4 +1,5 @@
 char message[80];
+String clientId = "ESP32WindowControl";
 
 // FIXME: WiFiManager will show default values, not what is persisted
 WiFiManagerParameter paramMqttServer("mqttserver", "MQTT server", mqttServer.c_str(), 40);
@@ -46,6 +47,8 @@ void setupWiFi() {
   }
   //wm.startConfigPortal("Window Control");
 
+  clientId = "ESP32Client-";
+  clientId += String(random(0xffffff), HEX);
 
   mqtt.setServer(mqttServer.c_str(), mqttPort.toInt());
 }
@@ -67,7 +70,7 @@ bool mqttConnect() {
   }
 
   Serial.print("Connecting to MQTT... ");
-  if (mqtt.connect(WiFi.getHostname(), mqttUser.c_str(), mqttPassword.c_str())) {
+  if (mqtt.connect(clientId.c_str(), mqttUser.c_str(), mqttPassword.c_str())) {
     Serial.println("MQTT Connected!");
     return true;
   } else {
