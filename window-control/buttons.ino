@@ -5,8 +5,8 @@
 #define BTN_UP 19
 
 void setupButtons() {
-  pinDebouncer.addPin(BTN_OPEN, LOW);
-  pinDebouncer.addPin(BTN_CLOSE, LOW);
+  pinDebouncer.addPin(BTN_OPEN, HIGH, INPUT_PULLUP);
+  pinDebouncer.addPin(BTN_CLOSE, HIGH, INPUT_PULLUP);
   
   pinDebouncer.addPin(BTN_DOWN, HIGH, INPUT_PULLUP);
   pinDebouncer.addPin(BTN_MIDDLE, HIGH, INPUT_PULLUP);
@@ -59,11 +59,13 @@ void onPinActivated(int pinNumber) {
     case BTN_OPEN:
       openTime = millis();
       windowOpen = true;
+      windowOpenDisplay();
       gfx->fillCircle(x, y, 16, GREEN);
       break;
     case BTN_CLOSE:
       closeTime = millis();
       windowOpen = false;
+      windowClosingDisplay();
       gfx->fillCircle(x + 20, y, 16, RED);
       break;
   }
