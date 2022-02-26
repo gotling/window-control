@@ -32,7 +32,8 @@ void setupWiFi() {
   //wm.resetSettings();
   wm.setConfigPortalBlocking(false);
   wm.setConfigPortalTimeout(60);
-  
+  wm.setParamsPage(true);
+
   // invert theme, dark
   wm.setDarkMode(true);
   // set Hostname
@@ -60,6 +61,7 @@ void setupCustomParameters() {
   wm.addParameter(&paramMqttPassword);
   wm.addParameter(&paramMqttTopic);
   wm.setSaveConfigCallback(saveConfigCallback);
+  wm.setPreSaveConfigCallback(saveConfigCallback);
 }
 
 bool mqttConnect() {
