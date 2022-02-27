@@ -81,10 +81,12 @@ Preferences preferences;
 
 int screenTimeout = 120000; // Milliseconds
 int mode = 0;
-int co2UpperThreshold = 1000;
-int co2LowerThreshold = 900;
-int openTimeUpperThreshold = 2; //120000;
-int openTimeLowerThreshold = 1; //60000;
+int ledWarning = 1;
+int co2UpperThreshold = 2000;
+int co2LowerThreshold = 1000;
+int openTimeUpperThreshold = 10; //120000;
+int openTimeLowerThreshold = 5; //60000;
+int openTime2Threshold = 10;
 
 #define MQTT_SERVER "io.adafruit.com"
 #define MQTT_PORT "8883"
@@ -220,10 +222,10 @@ void setup()
   // Configuration
   preferences.begin("settings", true);
   mode = preferences.getInt("mode", 0);
-  co2UpperThreshold = preferences.getInt("co2Max", 1000);
-  co2LowerThreshold = preferences.getInt("co2Min", 900);
-  openTimeUpperThreshold = preferences.getInt("openMax", 2);
-  openTimeLowerThreshold = preferences.getInt("openMin", 1);
+  co2UpperThreshold = preferences.getInt("co2Max", 2000);
+  co2LowerThreshold = preferences.getInt("co2Min", 1000);
+  openTimeUpperThreshold = preferences.getInt("openMax", 10);
+  openTimeLowerThreshold = preferences.getInt("openMin", 5);
   preferences.end();
   preferences.begin("mqtt", true);
   mqttServer = preferences.getString("server", mqttServer);
