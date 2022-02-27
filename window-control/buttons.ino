@@ -7,6 +7,12 @@
 #define BTN_MIDDLE 5
 #define BTN_UP 19
 
+// Figure out if both open and close are pressed at the same time to stop windows in current position
+bool active = false;
+bool active2 = false;
+bool stop = false;
+bool stop2 = false;
+
 void setupButtons() {
   pinDebouncer.addPin(CLOSE_IN, HIGH);
   pinDebouncer.addPin(CLOSE_IN_2, HIGH);
@@ -62,6 +68,11 @@ void onPinActivated(int pinNumber) {
 
   switch (pinNumber) {
     case CLOSE_IN:
+      if (active)
+        stop = true;
+      else
+        active = true;
+
       closeTime = millis();
       windowOpen = false;
       windowClosingDisplay();
@@ -69,6 +80,11 @@ void onPinActivated(int pinNumber) {
       mqttSendEvent(RECEIVE_CLOSE);
       break;
     case CLOSE_IN_2:
+      if (active2)
+        stop2 = true;
+      else
+        active2 = true;
+      
       closeTime2 = millis();
       windowOpen2 = false;
       windowClosingDisplay();
@@ -76,6 +92,11 @@ void onPinActivated(int pinNumber) {
       mqttSendEvent(RECEIVE_CLOSE_2);
       break;
     case OPEN_IN:
+      if (active)
+        stop = true;
+      else
+        active = true;
+
       openTime = millis();
       windowOpen = true;
       windowOpenDisplay();
@@ -83,6 +104,11 @@ void onPinActivated(int pinNumber) {
       mqttSendEvent(RECEIVE_OPEN);
       break;
     case OPEN_IN_2:
+      if (active2)
+        stop2 = true;
+      else
+        active2 = true;
+      
       openTime2 = millis();
       windowOpen2 = true;
       windowOpenDisplay();
@@ -96,4 +122,25 @@ void onPinActivated(int pinNumber) {
 void onPinDeactivated(int pinNumber) {
   Serial.print("buttonRelease: ");
   Serial.println(pinNumber);
+
+  // If button released after both buttons pressed, treat windows as closed
+  switch (pinNumber) {
+    case CLOSE_IN:
+      active = false;
+      break;
+    case CLOSE_IN_2:
+      active2 = false;
+      break;
+    case OPEN_IN:
+      active = false;
+      if (stop)
+        windowOpen = false;
+      stop = false;
+      break;
+    case OPEN_IN_2:
+      if (stop2)
+        windowOpen2 = false;
+      stop2 = false;
+      break;
+  }
 }
