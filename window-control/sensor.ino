@@ -31,9 +31,9 @@ unsigned int getAvg(unsigned int values[], int sizeOfArray) {
   }
   unsigned int sum = 0;
   int iMax = sizeOfArray;
-  if (counter < sizeOfArray)
-    iMax = counter;
-
+  if (counter + 1 < sizeOfArray)
+    iMax = counter + 1;
+  
   for (int i = 0; i < iMax; i++) {
     sum += values[i];
   }
