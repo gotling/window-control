@@ -154,6 +154,7 @@ void windowOpenDisplay() {
 
 void windowClosingDisplay() {
   displayState = displayWindowClosing;
+
   int x = 0;
   int y = 100;
 
@@ -207,6 +208,7 @@ void enumToText(int value) {
 
 void preferencesDisplay() {
   displayState = displayPreferences;
+
   int x = 0;
   int y = 30;
 

@@ -32,24 +32,24 @@ void onPinActivated(int pinNumber) {
   switch(displayState) {
     case displayStats:
       switch (pinNumber) {
-        case BTN_UP:
-          openWindow();
-          break;
-        case BTN_DOWN:
-          closeWindow();
-          break;
+        // case BTN_UP:
+        //   openWindow();
+        //   break;
+        // case BTN_DOWN:
+        //   closeWindow();
+        //   break;
         case BTN_MIDDLE:
           preferencesDisplay();
           break;
       }
       break;
-    case displayWindowOpen:
-      switch (pinNumber) {
-        case BTN_DOWN:
-          closeWindow();
-          break;
-      }
-      break;
+    // case displayWindowOpen:
+    //   switch (pinNumber) {
+    //     case BTN_DOWN:
+    //       closeWindow();
+    //       break;
+    //   }
+    //   break;
     case displayPreferences:
       preferencesHandleButtons(pinNumber);
       break;
@@ -75,20 +75,6 @@ void onPinActivated(int pinNumber) {
 
 // Button released
 void onPinDeactivated(int pinNumber) {
-  unsigned int x = 200;
-  unsigned int y = 220;
-
   Serial.print("buttonRelease: ");
   Serial.println(pinNumber);
-
-  switch (pinNumber) {
-    case BTN_OPEN:
-      gfx->fillCircle(x, y, 16, BLACK);
-      gfx->drawCircle(x, y, 16, GREEN);
-      break;
-    case BTN_CLOSE:
-      gfx->fillCircle(x + 20, y, 16, BLACK);
-      gfx->drawCircle(x + 20, y, 16, RED);
-      break;
-  }
 }
