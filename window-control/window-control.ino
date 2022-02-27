@@ -146,10 +146,12 @@ typedef enum {
 } Event;
 
 void refreshLED() {
-  if (a1 >= co2UpperThreshold) {
-    digitalWrite(LED, HIGH);
-  } else if (a1 <= co2LowerThreshold) {
-    digitalWrite(LED, LOW);
+  if (ledWarning) {
+    if (a1 >= co2UpperThreshold) {
+      digitalWrite(LED, HIGH);
+    } else if (a1 <= co2LowerThreshold) {
+      digitalWrite(LED, LOW);
+    }
   }
 }
 
@@ -193,6 +195,8 @@ void readAndRefresh() {
 
   serialLog();
 
+  refreshLED();
+
   switch(displayState) {
     case displayStats:
       refreshDisplay();
@@ -210,8 +214,6 @@ void readAndRefresh() {
       refreshDisplay();
       break;
   }
-
-  refreshLED();
 }
 
 // Setup
