@@ -1,12 +1,17 @@
-#define BTN_OPEN 35
-#define BTN_CLOSE 34
+#define CLOSE_IN 35
+#define CLOSE_IN_2 34
+#define OPEN_IN 32
+#define OPEN_IN_2 33
+
 #define BTN_DOWN 18
 #define BTN_MIDDLE 5
 #define BTN_UP 19
 
 void setupButtons() {
-  pinDebouncer.addPin(BTN_OPEN, HIGH, INPUT_PULLUP);
-  pinDebouncer.addPin(BTN_CLOSE, HIGH, INPUT_PULLUP);
+  pinDebouncer.addPin(CLOSE_IN, HIGH);
+  pinDebouncer.addPin(CLOSE_IN_2, HIGH);
+  pinDebouncer.addPin(OPEN_IN, HIGH);
+  pinDebouncer.addPin(OPEN_IN_2, HIGH);
   
   pinDebouncer.addPin(BTN_DOWN, HIGH, INPUT_PULLUP);
   pinDebouncer.addPin(BTN_MIDDLE, HIGH, INPUT_PULLUP);
@@ -56,19 +61,33 @@ void onPinActivated(int pinNumber) {
   }
 
   switch (pinNumber) {
-    case BTN_OPEN:
-      openTime = millis();
-      windowOpen = true;
-      windowOpenDisplay();
-      gfx->fillCircle(x, y, 16, GREEN);
-      mqttSendEvent(RECEIVE_OPEN);
-      break;
-    case BTN_CLOSE:
+    case CLOSE_IN:
       closeTime = millis();
       windowOpen = false;
       windowClosingDisplay();
-      gfx->fillCircle(x + 20, y, 16, RED);
+      
       mqttSendEvent(RECEIVE_CLOSE);
+      break;
+    case CLOSE_IN_2:
+      closeTime2 = millis();
+      windowOpen2 = false;
+      windowClosingDisplay();
+      
+      mqttSendEvent(RECEIVE_CLOSE_2);
+      break;
+    case OPEN_IN:
+      openTime = millis();
+      windowOpen = true;
+      windowOpenDisplay();
+
+      mqttSendEvent(RECEIVE_OPEN);
+      break;
+    case OPEN_IN_2:
+      openTime2 = millis();
+      windowOpen2 = true;
+      windowOpenDisplay();
+      
+      mqttSendEvent(RECEIVE_OPEN_2);
       break;
   }
 }

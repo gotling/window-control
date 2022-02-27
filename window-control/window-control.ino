@@ -68,8 +68,8 @@ const int resolution = 8;
 FTDebouncer pinDebouncer;
 
 // Output MOSFET
-#define OPEN_OUT 33
-#define CLOSE_OUT 32
+#define CLOSE_OUT 23
+#define CLOSE_OUT_2 22
 
 // Network
 WiFiManager wm;
@@ -120,13 +120,16 @@ unsigned int avg5[30];
 unsigned int avg15[90];
 
 unsigned long openTime = millis();
+unsigned long openTime2 = millis();
 unsigned long closeTime = millis();
+unsigned long closeTime2 = millis();
 unsigned long lastActionTime = millis();
-unsigned long mqttTime = -60000;
+unsigned long mqttTime = -30000;
 
 // State
 unsigned int CO2;
 bool windowOpen = false;
+bool windowOpen2 = false;
 unsigned int a1;
 unsigned int a5;
 unsigned int a15;
@@ -140,9 +143,13 @@ typedef enum {
 
 typedef enum {
   RECEIVE_OPEN,
+  RECEIVE_OPEN_2,
   RECEIVE_CLOSE,
+  RECEIVE_CLOSE_2,
   SEND_OPEN,
-  SEND_CLOSE
+  SEND_OPEN_2,
+  SEND_CLOSE,
+  SEND_CLOSE_2
 } Event;
 
 void refreshLED() {
@@ -155,23 +162,8 @@ void refreshLED() {
   }
 }
 
-void openWindow() {
-  Serial.println("OPEN OUT HIGH");
-  windowOpen = true;
-  openTime = millis();
-  windowOpenDisplay();
-  
-  digitalWrite(OPEN_OUT, HIGH);
-  delay(100);
-  digitalWrite(OPEN_OUT, LOW);
-
-  mqttSendEvent(SEND_OPEN);
-}
-
 void closeWindow() {
-  Serial.println("CLOSE OUT HIGH");
-  windowOpen = false;
-  closeTime = millis();
+  Serial.println("Closing window in main hall");
   windowClosingDisplay();
   
   digitalWrite(CLOSE_OUT, HIGH);
@@ -181,12 +173,30 @@ void closeWindow() {
   mqttSendEvent(SEND_CLOSE);
 }
 
+void closeWindow2() {
+  Serial.println("Closing window in secondary hall");
+  windowClosingDisplay();
+  
+  digitalWrite(CLOSE_OUT_2, HIGH);
+  delay(100);
+  digitalWrite(CLOSE_OUT_2, LOW);
+
+  mqttSendEvent(SEND_CLOSE_2);
+}
+
 void actionOnCO2() {
   if (mode != OFF && windowOpen) {
     unsigned long diff = (millis() - openTime) / 60000;
 
     if (diff >= openTimeUpperThreshold || (diff >= openTimeLowerThreshold && a1 <= co2LowerThreshold))
       closeWindow();
+  }
+
+  if (mode != OFF && windowOpen2) {
+    unsigned long diff = (millis() - openTime2) / 60000;
+
+    if (diff >= openTime2Threshold)
+      closeWindow2();
   }
 }
 
@@ -261,10 +271,10 @@ void setup()
   setupButtons();
 
   // Output MOSFET
-  pinMode(OPEN_OUT, OUTPUT);
   pinMode(CLOSE_OUT, OUTPUT);
-  digitalWrite(OPEN_OUT, LOW);
+  pinMode(CLOSE_OUT_2, OUTPUT);
   digitalWrite(CLOSE_OUT, LOW);
+  digitalWrite(CLOSE_OUT_2, LOW);
 
   // Setup WiFiManager
   setupWiFi();

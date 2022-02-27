@@ -109,16 +109,22 @@ void mqttSend() {
 void mqttSendEvent(Event event) {
   switch (event) {
     case RECEIVE_OPEN:
-      sprintf(message, "receive,1\n");
+      sprintf(message, "in,1\n");
+      break;
+    case RECEIVE_OPEN_2:
+      sprintf(message, "in_2,1\n");
       break;
     case RECEIVE_CLOSE:
-      sprintf(message, "receive,0\n");
+      sprintf(message, "in,0\n");
       break;
-    case SEND_OPEN:
-      sprintf(message, "send,1\n");
+    case RECEIVE_CLOSE_2:
+      sprintf(message, "in_2,0\n");
       break;
     case SEND_CLOSE:
-      sprintf(message, "send,0\n");
+      sprintf(message, "out,0\n");
+      break;
+    case SEND_CLOSE_2:
+      sprintf(message, "out_2,0\n");
       break;
     default:
       Serial.println("MQTT send event: Unknown Event");      
