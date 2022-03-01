@@ -193,6 +193,7 @@ MenuItem menuItems[] {
   {.type = NUMBER, .name = "CO2 Lower", .value = &co2LowerThreshold, .text = NULL},
   {.type = NUMBER, .name = "Max Open Time (min)", .value = &openTimeUpperThreshold, .text = NULL},
   {.type = NUMBER, .name = "Min Open Time (min)", .value = &openTimeLowerThreshold, .text = NULL},
+  {.type = NUMBER, .name = "Hall 2 Open Time (min)", .value = &openTime2Threshold, .text = NULL},
 };
 
 void enumToText(int value) {
@@ -325,6 +326,7 @@ void preferencesSave() {
     preferences.putInt("co2Min", co2LowerThreshold);
     preferences.putInt("openMax", openTimeUpperThreshold);
     preferences.putInt("openMin", openTimeLowerThreshold);
+    preferences.putInt("open2", openTime2Threshold);
     preferences.end();
     pChanged = false;
     Serial.println("Preferences saved");

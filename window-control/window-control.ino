@@ -104,6 +104,7 @@ String mqttTopic = MQTT_TOPIC;
 enum {
   displayStats,
   displayWindowOpen,
+  displayWindowOpening,
   displayWindowClosing,
   displayPreferences
 } displayState = displayStats;
@@ -240,6 +241,7 @@ void setup()
   co2LowerThreshold = preferences.getInt("co2Min", 1000);
   openTimeUpperThreshold = preferences.getInt("openMax", 10);
   openTimeLowerThreshold = preferences.getInt("openMin", 5);
+  openTime2Threshold = preferences.getInt("open2", 10);
   preferences.end();
   preferences.begin("mqtt", true);
   mqttServer = preferences.getString("server", mqttServer);
