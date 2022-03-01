@@ -120,6 +120,12 @@ void mqttSendEvent(Event event) {
     case RECEIVE_CLOSE_2:
       sprintf(message, "in_2,0\n");
       break;
+    case RECEIVE_STOP:
+      sprintf(message, "in,0.5\n");
+      break;
+    case RECEIVE_STOP_2:
+      sprintf(message, "in_2,0.5\n");
+      break;
     case SEND_CLOSE:
       sprintf(message, "out,0\n");
       break;

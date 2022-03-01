@@ -7,9 +7,6 @@
 #define BTN_MIDDLE 5
 #define BTN_UP 19
 
-// Figure out if both open and close are pressed at the same time to stop windows in current position
-bool active = false;
-bool active2 = false;
 bool stop = false;
 bool stop2 = false;
 
@@ -68,53 +65,55 @@ void onPinActivated(int pinNumber) {
 
   switch (pinNumber) {
     case CLOSE_IN:
-      if (active)
-        stop = true;
-      else
-        active = true;
-
-      closeTime = millis();
-      windowOpen = false;
-      windowClosingDisplay();
-      
-      mqttSendEvent(RECEIVE_CLOSE);
+      windowClosePress(1);
       break;
     case CLOSE_IN_2:
-      if (active2)
-        stop2 = true;
-      else
-        active2 = true;
-      
-      closeTime2 = millis();
-      windowOpen2 = false;
-      windowClosingDisplay();
-      
-      mqttSendEvent(RECEIVE_CLOSE_2);
+      windowClosePress(2);
       break;
     case OPEN_IN:
-      if (active)
-        stop = true;
-      else
-        active = true;
-
-      openTime = millis();
-      windowOpen = true;
-      windowOpenDisplay();
-
-      mqttSendEvent(RECEIVE_OPEN);
+      windowOpenPress(1);
       break;
     case OPEN_IN_2:
-      if (active2)
-        stop2 = true;
-      else
-        active2 = true;
-      
-      openTime2 = millis();
-      windowOpen2 = true;
-      windowOpenDisplay();
-      
-      mqttSendEvent(RECEIVE_OPEN_2);
+      windowOpenPress(2);
       break;
+  }
+}
+
+void windowClosePress(int hall) {
+  Serial.print("Window close press, Hall ");
+  Serial.println(hall);
+  stop = false;
+  stop2 = false;
+  
+  if (hall == 1) {
+    windowOpen = false;
+    closeTime = millis();
+    windowClosingDisplay(1);
+    mqttSendEvent(RECEIVE_CLOSE);
+  } else {
+    windowOpen2 = false;
+    closeTime2 = millis();
+    windowClosingDisplay(2);
+    mqttSendEvent(RECEIVE_CLOSE_2);
+  } 
+}
+
+void windowOpenPress(int hall) {
+  Serial.print("Window open press, Hall ");
+  Serial.println(hall);
+  stop = false;
+  stop2 = false;
+  
+  if (hall == 1) {
+    windowOpen = true;
+    openTime = millis();
+    windowOpeningDisplay(1);
+    mqttSendEvent(RECEIVE_OPEN);
+  } else {
+    openTime2 = millis();
+    windowOpen2 = true;
+    windowOpeningDisplay(2);
+    mqttSendEvent(RECEIVE_OPEN_2);
   }
 }
 
@@ -126,21 +125,44 @@ void onPinDeactivated(int pinNumber) {
   // If button released after both buttons pressed, treat windows as closed
   switch (pinNumber) {
     case CLOSE_IN:
-      active = false;
+      if (stop) {
+        windowOpen = false;
+        closeTime = millis();
+        refreshDisplay();
+        mqttSendEvent(RECEIVE_STOP);
+      }
+
+      stop = true;
       break;
     case CLOSE_IN_2:
-      active2 = false;
+      if (stop2) {
+        windowOpen2 = false;
+        closeTime2 = millis();
+        refreshDisplay();
+        mqttSendEvent(RECEIVE_STOP_2);
+      }
+
+      stop2 = true;
       break;
     case OPEN_IN:
-      active = false;
-      if (stop)
+      if (stop) {
         windowOpen = false;
-      stop = false;
+        closeTime = millis();
+        refreshDisplay();
+        mqttSendEvent(RECEIVE_STOP);
+      }
+
+      stop = true;
       break;
     case OPEN_IN_2:
-      if (stop2)
+      if (stop2) {
         windowOpen2 = false;
-      stop2 = false;
+        closeTime2 = millis();
+        refreshDisplay();
+        mqttSendEvent(RECEIVE_STOP_2);
+      }
+
+      stop2 = true;
       break;
   }
 }
