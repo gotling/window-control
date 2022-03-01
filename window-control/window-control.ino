@@ -167,7 +167,7 @@ void refreshLED() {
 
 void closeWindow() {
   Serial.println("Closing window in main hall");
-  windowClosingDisplay();
+  windowClosingDisplay(1);
   
   digitalWrite(CLOSE_OUT, HIGH);
   delay(100);
@@ -178,7 +178,7 @@ void closeWindow() {
 
 void closeWindow2() {
   Serial.println("Closing window in secondary hall");
-  windowClosingDisplay();
+  windowClosingDisplay(2);
   
   digitalWrite(CLOSE_OUT_2, HIGH);
   delay(100);
@@ -210,6 +210,7 @@ void readAndRefresh() {
 
   refreshLED();
 
+  // Screens with refreshing data
   switch(displayState) {
     case displayStats:
       refreshDisplay();
@@ -217,15 +218,15 @@ void readAndRefresh() {
     case displayWindowOpen:
       windowOpenDisplay();
       break;
-    case displayWindowClosing:
-      windowClosingDisplay();
-      break;
-    case displayPreferences:
-      preferencesDisplay();
-      break;      
-    default:
-      refreshDisplay();
-      break;
+    // case displayWindowClosing:
+    //   windowClosingDisplay();
+    //   break;
+    // case displayPreferences:
+    //   preferencesDisplay();
+    //   break;      
+    // default:
+    //   refreshDisplay();
+    //   break;
   }
 }
 
@@ -326,7 +327,7 @@ void loop()
   }
 
   // Reset display to default
-  if (displayState == displayWindowClosing && (millis() - closeTime) > toastTime) {
+  if ((displayState == displayWindowClosing || displayState == displayWindowOpening) && (millis() - closeTime) > toastTime) {
     refreshDisplay();
   }
 

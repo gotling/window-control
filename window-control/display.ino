@@ -29,6 +29,14 @@ void printValue(unsigned int value, unsigned int x, unsigned int y) {
   gfx->println(value);
 }
 
+void printValueText(const char *text, unsigned int x, unsigned int y) {
+  gfx->setFont(&URW_Gothic_L_Book_30);
+  gfx->setTextColor(LIGHTGREY);
+  gfx->setTextSize(1);
+  gfx->setCursor(x, y);
+  gfx->println(text);
+}
+
 void printTextLarge(const char *text, unsigned int x, unsigned int y) {
   gfx->setFont(&URW_Gothic_L_Book_30);
   gfx->setTextColor(LIGHTGREY, BLACK);
@@ -58,49 +66,72 @@ void refreshDisplay() {
   displayState = displayStats;
 
   int x = 0;
-  int y = 16;
+  int y = 40;
 
   gfx->fillScreen(BLACK);
 
-  printHeader("Current", x, y);
-  printHeader("Min", x + 80, y);
-  printHeader("Max", x + 160, y);
+  gfx->setFont(&URW_Gothic_L_Book_30);
+  gfx->setTextColor(LIGHTGREY);
+  gfx->setCursor(x, y);
+  gfx->print("Hall ");
+  gfx->println(1);
 
   y += 30;
+  
+  // printHeader("CO2", x, y);
 
-  printValue(CO2, x, y);
-  printValue(minCO, x + 80, y);
-  printValue(maxCO, x + 160, y);
-  gfx->setFont(NULL);
+  // y += 20;
 
-  y += 20;
+  // printHeader("1 min", x, y);
+  // printHeader("5 min", x + 80, y);
+  // printHeader("15 min", x + 160, y);
 
-  printHeader("Average", x, y);
+  // y += 30;
 
-  y += 20;
+  // printValue(a1, x, y);
+  // printValue(a5, x + 80, y);
+  // printValue(a15, x + 160, y);
 
-  printHeader("1 min", x, y);
-  printHeader("5 min", x + 80, y);
-  printHeader("15 min", x + 160, y);
+  printHeader("CO2", x, y);
+  printHeader("Temp", x + 120, y);
 
   y += 30;
 
   printValue(a1, x, y);
-  printValue(a5, x + 80, y);
-  printValue(a15, x + 160, y);
 
-  y += 40;
-
-  printHeader("Temp", x, y);
-  printHeader("Humidity", x + 120, y);
+  sprintf(textDisplay, "%.1f %cC\0", temperature, (char) 0x7E);
+  printValueText(textDisplay, x + 120, y);
+  
+  y += 20;
+  printHeader("Humidity", x, y);
 
   y += 20;
 
-  sprintf(textDisplay, "%.1f %cC\0", temperature, (char) 0x7E);
-  printSmallValueText(textDisplay, x, y);
-  
   sprintf(textDisplay, "%d %%", humidity);
-  printSmallValueText(textDisplay, x + 120, y);
+  printSmallValueText(textDisplay, x, y);
+
+  y = 190;
+
+  gfx->setFont(&URW_Gothic_L_Book_30);
+  gfx->setTextColor(LIGHTGREY);
+  gfx->setCursor(x, y);
+  gfx->print("Hall ");
+  gfx->println(2);
+
+  y = 230;
+  gfx->setFont(&URW_Gothic_L_Book_16);
+  gfx->setTextColor(LIGHTGREY, BLACK);
+  gfx->setTextSize(1);
+  gfx->setCursor(x, y);
+  gfx->print("Mode: ");
+
+  if (mode == OFF) {
+    gfx->setTextColor(RED);
+    gfx->println("OFF");
+  } else {
+    gfx->setTextColor(GREEN);
+    gfx->println("ON");
+  }
 
   refreshTime();
 }
@@ -152,19 +183,46 @@ void windowOpenDisplay() {
   gfx->println(textDisplay);
 }
 
-void windowClosingDisplay() {
+void windowOpeningDisplay(int hall) {
+  displayState = displayWindowOpening;
+
+  int x = 0;
+  int y = 40;
+
+  gfx->fillScreen(BLACK);
+  gfx->setFont(&URW_Gothic_L_Book_30);
+  gfx->setTextColor(LIGHTGREY);
+
+  gfx->setCursor(x, y);
+  gfx->print("Hall ");
+  gfx->println(hall);
+  
+  y = 120;
+  gfx->setTextColor(CYAN);
+  gfx->setCursor(x, y);
+  gfx->println("Window");
+  gfx->println("opening..");
+}
+
+void windowClosingDisplay(int hall) {
   displayState = displayWindowClosing;
 
   int x = 0;
-  int y = 100;
+  int y = 40;
 
   gfx->fillScreen(BLACK);
-
   gfx->setFont(&URW_Gothic_L_Book_30);
+  gfx->setTextColor(LIGHTGREY);
+
+  gfx->setCursor(x, y);
+  gfx->print("Hall ");
+  gfx->println(hall);
+
+  y = 120;
   gfx->setTextColor(CYAN);
   gfx->setCursor(x, y);
-  gfx->println("Closing");
-  gfx->println("window..");
+  gfx->println("Window");
+  gfx->println("closing..");
 }
 
 unsigned short pIndex = 0;
@@ -189,8 +247,8 @@ typedef struct {
 MenuItem menuItems[] {
   {.type = BACK, .name = "Back", .value = NULL, .text = "Go Back"},
   {.type = ENUM, .name = "Mode", .value = &mode, .text = NULL},
-  {.type = NUMBER, .name = "CO2 Upper", .value = &co2UpperThreshold, .text = NULL},
-  {.type = NUMBER, .name = "CO2 Lower", .value = &co2LowerThreshold, .text = NULL},
+  {.type = NUMBER, .name = "CO2 Warning", .value = &co2UpperThreshold, .text = NULL},
+  {.type = NUMBER, .name = "CO2 Target", .value = &co2LowerThreshold, .text = NULL},
   {.type = NUMBER, .name = "Max Open Time (min)", .value = &openTimeUpperThreshold, .text = NULL},
   {.type = NUMBER, .name = "Min Open Time (min)", .value = &openTimeLowerThreshold, .text = NULL},
   {.type = NUMBER, .name = "Hall 2 Open Time (min)", .value = &openTime2Threshold, .text = NULL},
@@ -363,23 +421,39 @@ void preferencesHandleButtons(int button) {
   }
 }
 
-// Refresh that happens often
 void refreshTime() {
+  displayTimeWithHeader(120, 20, 1);
+  displayTimeWithHeader(120, 170, 2);
+}
+
+
+// Refresh that happens often
+void displayTimeWithHeader(int x, int y, int hall) {
   long diff;
 
-  if (displayState == displayStats) {  
-    unsigned int x = 0;
-    unsigned int y = 210;
-    
-    if (windowOpen) {
-      printHeader("Window open  ", x, y);
-      diff = (millis() - openTime) / 1000;
-      displayTime(diff, x, y + 20, 2, 2);
-    } else {
-      printHeader("Window closed", x, y);
-      diff = (millis() - closeTime) / 1000;
-      displayTime(diff, x, y + 20, 2, 2);
+  if (displayState == displayStats) {      
+    if (hall == 1) {
+      if (windowOpen) {
+        printHeader("Open  ", x, y);
+        diff = (millis() - openTime) / 1000;
+        displayTime(diff, x, y + 20, 2, 2);
+      } else {
+        printHeader("Closed", x, y);
+        diff = (millis() - closeTime) / 1000;
+        displayTime(diff, x, y + 20, 2, 2);
+      }
+    } else if (hall == 2) {
+      if (windowOpen2) {
+        printHeader("Open  ", x, y);
+        diff = (millis() - openTime2) / 1000;
+        displayTime(diff, x, y + 20, 2, 2);
+      } else {
+        printHeader("Closed", x, y);
+        diff = (millis() - closeTime2) / 1000;
+        displayTime(diff, x, y + 20, 2, 2);
+      }
     }
+    
   } else if (displayState == displayWindowOpen) {
     diff = (millis() - openTime) / 1000;
     displayTime(diff, 0, 90, 3, 4);
