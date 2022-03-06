@@ -327,7 +327,7 @@ void loop()
   }
 
   // Reset display to default
-  if ((displayState == displayWindowClosing || displayState == displayWindowOpening) && (millis() - closeTime) > toastTime) {
+  if ((displayState == displayWindowClosing || displayState == displayWindowOpening) && (millis() - lastActionTime) > toastTime) {
     refreshDisplay();
   }
 
