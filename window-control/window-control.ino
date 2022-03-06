@@ -308,7 +308,7 @@ void loop()
   }
 
   // Reset state of mulitple buttons being pressed
-  if (millis() - lastActionTime >= STOP_PRESS_RESET)) {
+  if (millis() - lastActionTime >= STOP_PRESS_RESET) {
     stop = false;
     stop2 = false;
   }
