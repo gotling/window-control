@@ -41,27 +41,21 @@ void onPinActivated(int pinNumber) {
     case BTN_DOWN:
     case BTN_MIDDLE:
     case BTN_UP:
+      // If screen is off, turn on and do nothing
+      if (tftBrightness == 0) {
+        tftBrightness = TFT_BRIGHTNESS;
+        ledcWrite(ledChannel, tftBrightness);
+        return;
+      }
       switch(displayState) {
         case displayStats:
-          switch (pinNumber) {
-            case BTN_MIDDLE:
-              preferencesDisplay();
-              break;
-          }
+          preferencesDisplay();
           break;
         case displayPreferences:
           preferencesHandleButtons(pinNumber);
           break;
       }
-
       break;
-  }
-
-  // Turn on display
-  if (tftBrightness == 0) {
-    tftBrightness = TFT_BRIGHTNESS;
-    ledcWrite(ledChannel, tftBrightness);
-    return; // THIS COULD BE THE PROBLEM WITH MISSING INPUT SIGNALS
   }
 }
 
