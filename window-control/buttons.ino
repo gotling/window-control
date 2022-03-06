@@ -110,25 +110,6 @@ void onPinDeactivated(int pinNumber) {
   // If button released after both buttons pressed, treat windows as closed
   switch (pinNumber) {
     case CLOSE_IN:
-      if (stop) {
-        windowOpen = false;
-        closeTime = millis();
-        refreshDisplay();
-        mqttSendEvent(RECEIVE_STOP);
-      }
-
-      stop = true;
-      break;
-    case CLOSE_IN_2:
-      if (stop2) {
-        windowOpen2 = false;
-        closeTime2 = millis();
-        refreshDisplay();
-        mqttSendEvent(RECEIVE_STOP_2);
-      }
-
-      stop2 = true;
-      break;
     case OPEN_IN:
       if (stop) {
         windowOpen = false;
@@ -139,6 +120,7 @@ void onPinDeactivated(int pinNumber) {
 
       stop = true;
       break;
+    case CLOSE_IN_2:
     case OPEN_IN_2:
       if (stop2) {
         windowOpen2 = false;
