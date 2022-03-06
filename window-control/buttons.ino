@@ -21,29 +21,9 @@ void setupButtons() {
 
 // Button pressed
 void onPinActivated(int pinNumber) {
-  // Turn on display  
   lastActionTime = millis();
-  if (tftBrightness == 0) {
-    tftBrightness = TFT_BRIGHTNESS;
-    ledcWrite(ledChannel, tftBrightness);
-    return;
-  }
-
   Serial.print("buttonPress: ");
   Serial.println(pinNumber);
-
-  switch(displayState) {
-    case displayStats:
-      switch (pinNumber) {
-        case BTN_MIDDLE:
-          preferencesDisplay();
-          break;
-      }
-      break;
-    case displayPreferences:
-      preferencesHandleButtons(pinNumber);
-      break;
-  }
 
   switch (pinNumber) {
     case CLOSE_IN:
@@ -58,6 +38,30 @@ void onPinActivated(int pinNumber) {
     case OPEN_IN_2:
       windowOpenPress(2);
       break;
+    case BTN_DOWN:
+    case BTN_MIDDLE:
+    case BTN_UP:
+      switch(displayState) {
+        case displayStats:
+          switch (pinNumber) {
+            case BTN_MIDDLE:
+              preferencesDisplay();
+              break;
+          }
+          break;
+        case displayPreferences:
+          preferencesHandleButtons(pinNumber);
+          break;
+      }
+
+      break;
+  }
+
+  // Turn on display
+  if (tftBrightness == 0) {
+    tftBrightness = TFT_BRIGHTNESS;
+    ledcWrite(ledChannel, tftBrightness);
+    return; // THIS COULD BE THE PROBLEM WITH MISSING INPUT SIGNALS
   }
 }
 
