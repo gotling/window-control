@@ -7,9 +7,6 @@
 #define BTN_MIDDLE 5
 #define BTN_UP 19
 
-bool stop = false;
-bool stop2 = false;
-
 void setupButtons() {
   pinDebouncer.addPin(CLOSE_IN, HIGH);
   pinDebouncer.addPin(CLOSE_IN_2, HIGH);
@@ -67,15 +64,15 @@ void onPinActivated(int pinNumber) {
 void windowClosePress(int hall) {
   Serial.print("Window close press, Hall ");
   Serial.println(hall);
-  stop = false;
-  stop2 = false;
   
   if (hall == 1) {
+    stop = false;
     windowOpen = false;
     closeTime = millis();
     windowClosingDisplay(1);
     mqttSendEvent(RECEIVE_CLOSE);
   } else {
+    stop2 = false;
     windowOpen2 = false;
     closeTime2 = millis();
     windowClosingDisplay(2);
@@ -86,17 +83,17 @@ void windowClosePress(int hall) {
 void windowOpenPress(int hall) {
   Serial.print("Window open press, Hall ");
   Serial.println(hall);
-  stop = false;
-  stop2 = false;
   
   if (hall == 1) {
+    stop = false;
     windowOpen = true;
     openTime = millis();
     windowOpeningDisplay(1);
     mqttSendEvent(RECEIVE_OPEN);
   } else {
-    openTime2 = millis();
+    stop2 = false;
     windowOpen2 = true;
+    openTime2 = millis();
     windowOpeningDisplay(2);
     mqttSendEvent(RECEIVE_OPEN_2);
   }

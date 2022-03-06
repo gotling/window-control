@@ -137,6 +137,11 @@ unsigned int a15;
 float temperature;
 unsigned int humidity;
 
+// For working out if both buttons were pressed at the same time to stop windows
+#define STOP_PRESS_RESET 2000
+bool stop = false;
+bool stop2 = false;
+
 typedef enum {
   OFF,
   CO2TIME
@@ -300,6 +305,12 @@ void loop()
   if (tftBrightness > 0 && (millis() - lastActionTime >= screenTimeout)) {
     tftBrightness = 0;
     ledcWrite(ledChannel, tftBrightness);
+  }
+
+  // Reset state of mulitple buttons being pressed
+  if (millis() - lastActionTime >= STOP_PRESS_RESET)) {
+    stop = false;
+    stop2 = false;
   }
 
   // Update time display  
