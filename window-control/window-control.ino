@@ -84,8 +84,8 @@ int mode = 0;
 int ledWarning = 1;
 int co2UpperThreshold = 2000;
 int co2LowerThreshold = 1000;
-int openTimeUpperThreshold = 10; //120000;
-int openTimeLowerThreshold = 5; //60000;
+int openTimeUpperThreshold = 10;
+int openTimeLowerThreshold = 5;
 int openTime2Threshold = 10;
 
 #define MQTT_SERVER "io.adafruit.com"
@@ -320,7 +320,7 @@ void loop()
 
   // Send to MQTT server
   if (millis() - mqttTime >= 60000) {
-    if(WiFi.status() == WL_CONNECTED)
+    if (WiFi.status() == WL_CONNECTED)
       mqttSend();
     
     mqttTime = millis();

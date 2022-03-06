@@ -24,9 +24,7 @@ void setupButtons() {
 
 // Button pressed
 void onPinActivated(int pinNumber) {
-  unsigned int x = 200;
-  unsigned int y = 220;
-
+  // Turn on display  
   lastActionTime = millis();
   if (tftBrightness == 0) {
     tftBrightness = TFT_BRIGHTNESS;
@@ -40,24 +38,11 @@ void onPinActivated(int pinNumber) {
   switch(displayState) {
     case displayStats:
       switch (pinNumber) {
-        // case BTN_UP:
-        //   openWindow();
-        //   break;
-        // case BTN_DOWN:
-        //   closeWindow();
-        //   break;
         case BTN_MIDDLE:
           preferencesDisplay();
           break;
       }
       break;
-    // case displayWindowOpen:
-    //   switch (pinNumber) {
-    //     case BTN_DOWN:
-    //       closeWindow();
-    //       break;
-    //   }
-    //   break;
     case displayPreferences:
       preferencesHandleButtons(pinNumber);
       break;
