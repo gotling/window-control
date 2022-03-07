@@ -223,15 +223,6 @@ void readAndRefresh() {
     case displayWindowOpen:
       windowOpenDisplay();
       break;
-    // case displayWindowClosing:
-    //   windowClosingDisplay();
-    //   break;
-    // case displayPreferences:
-    //   preferencesDisplay();
-    //   break;      
-    // default:
-    //   refreshDisplay();
-    //   break;
   }
 }
 
