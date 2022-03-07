@@ -11,6 +11,8 @@
  * https://github.com/ubidefeo/FTDebouncer
  * DHT sensor library by Adafruit 
  * https://github.com/adafruit/DHT-sensor-library
+ * WiFiManager by tzapu
+ * https://github.com/tzapu/WiFiManager
  * PubSubClient by Nick O'Leary
  * https://github.com/knolleary/pubsubclient
  */
