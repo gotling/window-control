@@ -138,7 +138,7 @@ float temperature;
 unsigned int humidity;
 
 // For working out if both buttons were pressed at the same time to stop windows
-#define STOP_PRESS_RESET 2000
+#define STOP_PRESS_RESET 5000
 bool stop = false;
 bool stop2 = false;
 
