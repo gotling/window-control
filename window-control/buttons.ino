@@ -45,7 +45,7 @@ void onPinActivated(int pinNumber) {
       if (tftBrightness == 0) {
         tftBrightness = TFT_BRIGHTNESS;
         ledcWrite(ledChannel, tftBrightness);
-        return;
+        break;
       }
       switch(displayState) {
         case displayStats:
