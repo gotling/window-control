@@ -166,7 +166,7 @@ void refreshLED() {
   if (ledWarning) {
     if (a1 >= co2UpperThreshold) {
       digitalWrite(LED, HIGH);
-    } else if (a1 <= co2LowerThreshold) {
+    } else if (a1 < co2UpperThreshold) {
       digitalWrite(LED, LOW);
     }
   }
