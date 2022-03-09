@@ -1,6 +1,6 @@
 # Window Control
 
-Control automatic windows based on sensor data or time.
+Control electric windows based on sensor data or time.
 
 Hardware hooks in parallel to existing buttons used to control windows.
 
@@ -9,6 +9,8 @@ Hardware hooks in parallel to existing buttons used to control windows.
 # Configuration
 
 Preferences can be set from a menu. If device screen is off, press any keys to turn it on, then press any key again to open preferences. Navigate preferences with up and down buttons. Select for change with middle button. Change value with up and down. Confirm change with middle button. Save preferences by selecting Go Back which will bring you to the main screen.
+
+![Menu](menu.jpeg)
 
 WiFi and MQTT is configured using a computer or mobile device. If not connected before, an access point will be available. Connect to it and choose WiFi network the device should connect to.
 
