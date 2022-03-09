@@ -42,12 +42,6 @@ Written in Arduino IDE 2.0.
 
 Coded in C.
 
-# Enclosures
-
-Boxes for installing the components are modelled in Fusion 360.
-
-https://a360.co/3J9pDIU
-
 **Extra Fonts**
 
 http://oleddisplay.squix.ch/
@@ -55,6 +49,14 @@ http://oleddisplay.squix.ch/
 **Modifying font**
 
 https://tchapi.github.io/Adafruit-GFX-Font-Customiser/
+
+# Enclosures
+
+Boxes for installing the components are modelled in Fusion 360.
+
+https://a360.co/3J9pDIU
+
+![Model](model.jpeg)
 
 # Libraries
 
