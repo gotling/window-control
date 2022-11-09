@@ -89,6 +89,7 @@ int co2LowerThreshold = 1000;
 int openTimeUpperThreshold = 10;
 int openTimeLowerThreshold = 5;
 int openTime2Threshold = 10;
+int tempLowerThreshold = 16;
 
 #define MQTT_SERVER "io.adafruit.com"
 #define MQTT_PORT "8883"
@@ -146,7 +147,8 @@ bool stop2 = false;
 
 typedef enum {
   OFF,
-  CO2TIME
+  CO2TIME,
+  TEMPTIME
 } ModeType;
 
 typedef enum {
@@ -194,14 +196,21 @@ void closeWindow2() {
   mqttSendEvent(SEND_CLOSE_2);
 }
 
-void actionOnCO2() {
+void actionOnSensor() {
   int diff;
   
   if (mode != OFF && windowOpen) {
     diff = (millis() - openTime) / 60000;
 
-    if (diff >= openTimeUpperThreshold || (diff >= openTimeLowerThreshold && a1 <= co2LowerThreshold))
+    if (diff >= openTimeUpperThreshold)
       closeWindow();
+    else if (temperature <= tempLowerThreshold)
+      closeWindow();
+    else if (diff >= openTimeLowerThreshold) {
+      if ((mode == CO2TIME) && (a1 <= co2LowerThreshold)) {
+        closeWindow();
+      }
+    }
   }
 
   if (mode != OFF && windowOpen2) {
@@ -243,6 +252,7 @@ void setup()
   openTimeUpperThreshold = preferences.getInt("openMax", 10);
   openTimeLowerThreshold = preferences.getInt("openMin", 5);
   openTime2Threshold = preferences.getInt("open2", 10);
+  tempLowerThreshold = preferences.getInt("tempMin", 16.0);
   preferences.end();
   preferences.begin("mqtt", true);
   mqttServer = preferences.getString("server", mqttServer);
@@ -319,7 +329,7 @@ void loop()
   if (millis() - statsTimer >= 10000) {
     readAndRefresh();
 
-    actionOnCO2();
+    actionOnSensor();
     
     statsTimer = millis();
   }

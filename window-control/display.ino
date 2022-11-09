@@ -250,6 +250,7 @@ MenuItem menuItems[] {
   {.type = ENUM, .name = "Mode", .value = &mode, .text = NULL},
   {.type = NUMBER, .name = "CO2 Warning", .value = &co2UpperThreshold, .text = NULL},
   {.type = NUMBER, .name = "CO2 Target", .value = &co2LowerThreshold, .text = NULL},
+  {.type = NUMBER, .name = "Minimum Temperature", .value = &tempLowerThreshold, .text = NULL},
   {.type = NUMBER, .name = "Max Open Time (min)", .value = &openTimeUpperThreshold, .text = NULL},
   {.type = NUMBER, .name = "Min Open Time (min)", .value = &openTimeLowerThreshold, .text = NULL},
   {.type = NUMBER, .name = "Hall 2 Open Time (min)", .value = &openTime2Threshold, .text = NULL},
@@ -262,7 +263,7 @@ void enumToText(int value) {
   if (value == 0)
     snprintf(buf, 12, "%s", "OFF");
   else if (value == 1)
-    snprintf(buf, 12, "%s", "CO2+Time");
+    snprintf(buf, 12, "%s", "ON");
   else
     snprintf(buf, 12, "%s", "Unknown");
 }
@@ -387,6 +388,7 @@ void preferencesSave() {
     preferences.putInt("openMax", openTimeUpperThreshold);
     preferences.putInt("openMin", openTimeLowerThreshold);
     preferences.putInt("open2", openTime2Threshold);
+    preferences.putInt("tempMin", tempLowerThreshold);
     preferences.end();
     pChanged = false;
     Serial.println("Preferences saved");
