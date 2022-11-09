@@ -2,6 +2,9 @@ void setupMHZ19() {
   mySerial.begin(BAUDRATE);
   myMHZ19.begin(mySerial);
 
+  // Disable auto calibration
+  myMHZ19.autoCalibration(false);
+
   char myVersion[4];
   myMHZ19.getVersion(myVersion);
 
@@ -21,8 +24,6 @@ void setupMHZ19() {
   Serial.print("Temperature Cal: ");
   Serial.println(myMHZ19.getTempAdjustment());
   Serial.print("ABC Status: "); myMHZ19.getABC() ? Serial.println("ON") :  Serial.println("OFF");
-
-  myMHZ19.autoCalibration();
 }
 
 unsigned int getAvg(unsigned int values[], int sizeOfArray) {

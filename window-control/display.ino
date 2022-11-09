@@ -234,7 +234,8 @@ typedef enum {
 	BACK,
 	TEXT,
   ENUM,
-	NUMBER
+	NUMBER,
+  CO2CAL
 } MenuItemType;
 
 typedef struct {
@@ -252,6 +253,7 @@ MenuItem menuItems[] {
   {.type = NUMBER, .name = "Max Open Time (min)", .value = &openTimeUpperThreshold, .text = NULL},
   {.type = NUMBER, .name = "Min Open Time (min)", .value = &openTimeLowerThreshold, .text = NULL},
   {.type = NUMBER, .name = "Hall 2 Open Time (min)", .value = &openTime2Threshold, .text = NULL},
+  {.type = CO2CAL, .name = "CO2 Calibration", .value = NULL, .text = "Set now"}
 };
 
 void enumToText(int value) {
@@ -411,6 +413,11 @@ void preferencesHandleButtons(int button) {
     case BTN_MIDDLE:
       if (pIndex == 0) {
         // Close preferences
+        preferencesSave();
+        refreshDisplay();
+      } else if (menuItems[pIndex].type == CO2CAL) {
+        // Calibrate CO2 lowest point to current value        
+        myMHZ19.calibrate();
         preferencesSave();
         refreshDisplay();
       } else {
